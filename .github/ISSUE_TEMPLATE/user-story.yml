@@ -1,0 +1,47 @@
+name: User Story
+description: A user story for the Amazon Seller Autopilot platform
+title: "[STORY] "
+labels: ["user-story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User Story
+      description: "As a [role], I want [feature], so that [benefit]"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: List the acceptance criteria
+    validations:
+      required: true
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      options:
+        - "EP01: Multi-Tenant Infrastructure"
+        - "EP02: Product Listing Automation"
+        - "EP03: A+ Content & Brand Store"
+        - "EP04: Inventory Management"
+        - "EP05: PPC Advertising Automation"
+        - "EP06: Dynamic Pricing"
+        - "EP07: Competitor Analysis"
+        - "EP08: Keyword Research & SEO"
+        - "EP09: Promotions & Deals"
+        - "EP10: Order Management"
+        - "EP11: Financial Analytics"
+        - "EP12: Compliance & Account Health"
+        - "EP13: Multi-Marketplace Expansion"
+        - "EP14: Product Launch Orchestration"
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low

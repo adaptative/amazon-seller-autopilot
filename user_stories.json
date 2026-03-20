@@ -1,0 +1,284 @@
+[
+  {
+    "title": "[EPIC] EP01: Multi-Tenant Infrastructure & Platform Foundation",
+    "labels": ["epic", "phase-1", "infrastructure"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## Epic: Multi-Tenant Infrastructure & Platform Foundation\n\n**Objective:** Establish the core multi-tenant SaaS infrastructure, authentication, billing, and control plane that all agents and features depend on.\n\n**Phase:** 1 (Months 1-4)\n\n**Key Outcomes:**\n- AWS infrastructure provisioned (EKS, RDS, Redis, SQS, S3)\n- Multi-tenant control plane with tenant isolation\n- OAuth 2.0 flow for Amazon SP-API and Ads API authorization\n- CI/CD pipeline with infrastructure-as-code\n- Monitoring and observability stack deployed\n\n**Dependencies:** None (foundational)\n\n**Related Stories:** #2 through #12"
+  },
+  {
+    "title": "[STORY] Tenant onboarding with Amazon SP-API OAuth authorization",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** new Amazon seller,\n**I want to** connect my Amazon Seller Central account to the platform via OAuth,\n**So that** the platform's AI agents can securely access my seller data without sharing my credentials.\n\n## Acceptance Criteria\n\n- [ ] Seller can initiate Login with Amazon (LWA) OAuth 2.0 flow from the onboarding screen\n- [ ] Platform requests only the minimum required SP-API roles (Product Listing, Pricing, Inventory, etc.)\n- [ ] OAuth refresh tokens are encrypted at rest with per-tenant encryption keys\n- [ ] Seller can see which permissions they've granted and revoke access at any time\n- [ ] Multi-marketplace authorization supported (NA, EU, FE regions)\n- [ ] Onboarding wizard validates API connectivity before completing setup\n- [ ] Tenant record created in control plane with unique tenant_id\n- [ ] All subsequent API calls are scoped to the authorized seller's account\n\n## Technical Notes\n- Use Amazon's OAuth 2.0 authorization code grant flow\n- Store refresh tokens in AWS Secrets Manager or encrypted DB column\n- Implement token refresh logic with retry and exponential backoff\n- Support both self-authorized (private) and OAuth-authorized (public) app models\n\n## Epic: EP01 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[STORY] Multi-tenant database with row-level security isolation",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** platform operator,\n**I want** every database query to be automatically scoped to the requesting tenant,\n**So that** no seller can ever access another seller's data, even if application code has bugs.\n\n## Acceptance Criteria\n\n- [ ] PostgreSQL Row-Level Security (RLS) policies enforce tenant isolation on all tables\n- [ ] Every table includes a `tenant_id` column as part of the RLS policy\n- [ ] `tenant_id` is set by middleware from the authenticated session, never by AI agents or user input\n- [ ] Per-tenant encryption keys for sensitive data (API tokens, financial data)\n- [ ] Database migration system supports RLS policy updates\n- [ ] Automated tests verify cross-tenant data access is impossible\n- [ ] Connection pooling configured with tenant-aware session variables\n- [ ] Query performance is not degraded by more than 5% due to RLS overhead\n\n## Technical Notes\n- Use `SET app.current_tenant = 'tenant_id'` on each connection\n- RLS policies: `CREATE POLICY tenant_isolation ON table USING (tenant_id = current_setting('app.current_tenant'))`\n- pgvector extension for semantic search per tenant\n- Consider schema-per-tenant for enterprise tier customers\n\n## Epic: EP01 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[STORY] Tenant billing and subscription management",
+    "labels": ["user-story", "phase-1", "infrastructure", "P1-high"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want to** choose a subscription plan and manage my billing,\n**So that** I can access the automation features appropriate for my business size.\n\n## Acceptance Criteria\n\n- [ ] Subscription tiers available: Starter ($99/mo), Growth ($299/mo), Professional ($599/mo), Enterprise ($1,499+/mo)\n- [ ] Stripe integration for payment processing and subscription management\n- [ ] Usage-based billing for AI agent actions beyond tier allowances\n- [ ] Ad spend commission tracking (2-5% of managed spend above tier limits)\n- [ ] Self-service plan upgrades and downgrades\n- [ ] Invoice generation and billing history dashboard\n- [ ] Grace period and dunning for failed payments\n- [ ] Feature flags tied to subscription tier (e.g., number of agents, marketplaces)\n\n## Epic: EP01 | Priority: P1 | Points: 5"
+  },
+  {
+    "title": "[STORY] API gateway with rate limiting and tenant routing",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** platform operator,\n**I want** all API requests to be authenticated, rate-limited per tenant, and routed to the correct agent services,\n**So that** the platform remains stable and no single tenant can degrade service for others.\n\n## Acceptance Criteria\n\n- [ ] API gateway authenticates all requests via JWT/session tokens (Amazon Cognito)\n- [ ] Per-tenant rate limiting with configurable thresholds per subscription tier\n- [ ] Request routing to appropriate agent microservices based on endpoint\n- [ ] Noisy-neighbor protection: per-tenant resource quotas and fair scheduling\n- [ ] API versioning support (v1, v2, etc.)\n- [ ] Request/response logging with tenant context for debugging\n- [ ] Health check endpoints for all services\n- [ ] Circuit breaker pattern for downstream Amazon API failures\n\n## Epic: EP01 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[STORY] Event-driven architecture with SQS and EventBridge",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** platform developer,\n**I want** an event bus that routes Amazon SP-API notifications and internal agent events to the correct tenant's agent pipeline,\n**So that** agents can react to real-time changes (price updates, inventory events, listing issues) asynchronously.\n\n## Acceptance Criteria\n\n- [ ] SQS FIFO queues for ordered per-tenant event processing\n- [ ] EventBridge rules for cross-service event routing\n- [ ] SP-API notification subscriptions: ANY_OFFER_CHANGED, LISTINGS_ITEM_STATUS_CHANGE, LISTINGS_ITEM_ISSUES_CHANGE, ITEM_INVENTORY_EVENT_CHANGE, ITEM_SALES_EVENT_CHANGE, ORDER_CHANGE\n- [ ] Dead letter queues for failed event processing\n- [ ] Event schema registry for type-safe event contracts\n- [ ] Per-tenant event filtering and routing\n- [ ] Retry logic with exponential backoff for transient failures\n- [ ] Event replay capability for debugging\n\n## Epic: EP01 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[STORY] CI/CD pipeline and infrastructure-as-code",
+    "labels": ["user-story", "phase-1", "infrastructure", "P1-high"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** platform developer,\n**I want** automated deployment pipelines and IaC for all infrastructure,\n**So that** we can deploy reliably, reproduce environments, and scale without manual configuration.\n\n## Acceptance Criteria\n\n- [ ] Terraform or AWS CDK for all infrastructure provisioning\n- [ ] GitHub Actions CI/CD pipeline for automated testing and deployment\n- [ ] Separate environments: dev, staging, production\n- [ ] Container image builds with security scanning\n- [ ] Database migration automation with rollback capability\n- [ ] Feature flag management (LaunchDarkly or similar)\n- [ ] Automated integration tests against Amazon SP-API sandbox\n- [ ] Infrastructure drift detection\n\n## Epic: EP01 | Priority: P1 | Points: 5"
+  },
+  {
+    "title": "[STORY] Monitoring, observability, and agent tracing",
+    "labels": ["user-story", "phase-1", "infrastructure", "P1-high"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** platform operator,\n**I want** comprehensive monitoring of infrastructure health, API performance, and AI agent behavior,\n**So that** I can detect issues proactively and debug agent decisions.\n\n## Acceptance Criteria\n\n- [ ] CloudWatch metrics and alarms for all AWS resources\n- [ ] Datadog APM for request tracing across microservices\n- [ ] LangSmith integration for LLM call tracing and agent observability\n- [ ] Per-tenant dashboards showing API usage, agent actions, and error rates\n- [ ] Alert thresholds: API latency > 2s, error rate > 1%, agent failure rate > 5%\n- [ ] Decision trace logs: every agent decision logged with prompt, context, reasoning, and outcome\n- [ ] Cost tracking per tenant for LLM API usage\n- [ ] System uptime target: 99.9%\n\n## Epic: EP01 | Priority: P1 | Points: 5"
+  },
+  {
+    "title": "[STORY] Human approval workflow engine",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** AI agents to propose actions and wait for my approval before executing high-impact changes,\n**So that** I maintain control over my business while benefiting from AI automation.\n\n## Acceptance Criteria\n\n- [ ] Configurable approval policies: which actions require human approval vs auto-execute\n- [ ] Approval queue in dashboard with clear descriptions of proposed actions\n- [ ] One-click approve/reject with optional feedback\n- [ ] Approval timeout with configurable auto-reject/auto-approve behavior\n- [ ] Batch approval for similar actions (e.g., approve all price changes within 5%)\n- [ ] Approval delegation to team members with role-based permissions\n- [ ] Push notifications (email, mobile) for pending approvals\n- [ ] Full audit trail of all approvals, rejections, and auto-executions\n- [ ] Gradual autonomy: sellers can increase agent autonomy as trust builds\n\n## Epic: EP01 | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[STORY] Seller dashboard with real-time agent activity feed",
+    "labels": ["user-story", "phase-1", "frontend", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** a real-time dashboard showing what my AI agents are doing, what they've accomplished, and what needs my attention,\n**So that** I have full visibility into automated operations without manually checking each function.\n\n## Acceptance Criteria\n\n- [ ] Real-time activity feed showing agent actions via WebSocket updates\n- [ ] Summary cards: listings managed, orders processed, ad spend, revenue, profit\n- [ ] Pending approval queue prominently displayed\n- [ ] Agent status indicators: active, idle, error, awaiting approval\n- [ ] Quick filters by agent type (listing, pricing, ads, inventory)\n- [ ] Time-range selector for historical activity\n- [ ] Responsive design for desktop and tablet\n- [ ] Per-marketplace view toggle for multi-marketplace sellers\n\n## Epic: EP01 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP02: Product Listing Automation",
+    "labels": ["epic", "phase-1", "listing-agent"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## Epic: Product Listing Automation\n\n**Objective:** Build an AI agent that automates product listing creation, optimization, and maintenance using Amazon SP-API.\n\n**Phase:** 1 (Months 3-4)\n\n**Key Outcomes:**\n- AI-generated SEO-optimized product titles, bullet points, and descriptions\n- Automated listing quality monitoring and issue resolution\n- Product type definition lookups and attribute mapping\n- Listing suppression detection and remediation\n\n**APIs:** Listings Items API, Catalog Items API, Product Type Definitions API, Feeds API, Notifications API\n\n**Related Stories:** #11 through #16"
+  },
+  {
+    "title": "[STORY] AI-powered product listing generation",
+    "labels": ["user-story", "phase-1", "listing-agent", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to generate SEO-optimized product titles, bullet points, and descriptions from minimal input,\n**So that** I can list new products in minutes instead of hours, with content optimized for Amazon's A10 algorithm.\n\n## Acceptance Criteria\n\n- [ ] Seller provides: product name, key features, images, and target keywords\n- [ ] Agent generates: title (≤200 chars), 5 bullet points, description, and backend search terms\n- [ ] Content follows Amazon's style guidelines and category-specific requirements\n- [ ] Keywords naturally integrated without keyword stuffing\n- [ ] Competitor analysis informs content strategy (top 10 ASINs in category analyzed)\n- [ ] Seller can configure brand voice preferences (professional, casual, technical)\n- [ ] Generated content presented for human review before submission\n- [ ] Agent uses Product Type Definitions API to ensure all required attributes are populated\n- [ ] Support for variation listings (parent-child relationships)\n\n## Technical Notes\n- Use Claude API for content generation with category-specific system prompts\n- Integrate Catalog Items API to analyze competitor listings\n- Use Product Type Definitions API for schema validation before submission\n- Submit via Listings Items API (putListingsItem)\n\n## Epic: EP02 | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[STORY] Listing quality monitoring and auto-remediation",
+    "labels": ["user-story", "phase-1", "listing-agent", "P1-high"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to continuously monitor my listing quality scores and automatically fix issues,\n**So that** my listings never get suppressed or lose search visibility due to quality problems.\n\n## Acceptance Criteria\n\n- [ ] Subscribe to LISTINGS_ITEM_ISSUES_CHANGE and LISTINGS_ITEM_STATUS_CHANGE notifications\n- [ ] Detect and categorize issues: missing attributes, image quality, suppression risks, policy violations\n- [ ] Auto-fix low-risk issues (missing backend keywords, incomplete attributes) without human approval\n- [ ] Queue high-risk fixes (title changes, main image changes) for human approval\n- [ ] Dashboard showing listing health scores per ASIN with trend indicators\n- [ ] Alert seller when listings are suppressed or at risk of suppression\n- [ ] Track listing quality improvements over time\n- [ ] Integration with Amazon's Listing Quality Dashboard recommendations\n\n## Epic: EP02 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[STORY] Bulk listing creation and CSV import",
+    "labels": ["user-story", "phase-1", "listing-agent", "P2-medium"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller with a large catalog,\n**I want to** upload a CSV/spreadsheet of products and have the AI agent generate optimized listings for all of them,\n**So that** I can onboard my entire catalog efficiently.\n\n## Acceptance Criteria\n\n- [ ] Accept CSV/XLSX upload with product attributes (name, features, category, keywords)\n- [ ] AI generates optimized content for each product in batch\n- [ ] Progress indicator showing batch processing status\n- [ ] Review interface for batch approving/editing generated listings\n- [ ] Submit via JSON Listings Feed for bulk operations\n- [ ] Error handling with per-item status reporting\n- [ ] Rate limit compliance for batch API calls\n\n## Epic: EP02 | Priority: P2 | Points: 8"
+  },
+  {
+    "title": "[STORY] Listing content A/B testing",
+    "labels": ["user-story", "phase-2", "listing-agent", "P2-medium"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to run A/B tests on my listing titles and bullet points,\n**So that** I can continuously improve conversion rates with data-driven content optimization.\n\n## Acceptance Criteria\n\n- [ ] Agent generates 2-3 content variants per listing element\n- [ ] Automated rotation of variants over configurable test periods\n- [ ] Statistical significance calculation before declaring a winner\n- [ ] Auto-promotion of winning variants (with seller approval)\n- [ ] Test results dashboard with conversion rate, CTR, and session data per variant\n- [ ] Integration with Data Kiosk API for sales and traffic metrics\n\n## Epic: EP02 | Priority: P2 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP03: A+ Content & Brand Store Management",
+    "labels": ["epic", "phase-3", "content-agent"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## Epic: A+ Content & Brand Store Management\n\n**Objective:** AI agent that creates and manages A+ Content and Brand Store pages programmatically.\n\n**Phase:** 3 (Months 9-10)\n\n**Key Outcomes:**\n- AI-generated A+ Content modules (comparison charts, brand stories, enhanced images)\n- Programmatic Brand Store management via Brand Stores Management API (GA Feb 2026)\n- Section-level engagement tracking and optimization\n- A/B testing for content performance\n\n**APIs:** A+ Content Management API, Brand Stores Management API, Stores Analytics API\n\n**Key Stat:** Amazon's data shows high-quality stores generate up to 97% more sales than low-quality ones."
+  },
+  {
+    "title": "[STORY] AI-generated A+ Content modules",
+    "labels": ["user-story", "phase-3", "content-agent", "P1-high"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** brand-registered seller,\n**I want** the AI agent to generate A+ Content modules including comparison charts, brand stories, and enhanced product descriptions,\n**So that** my detail pages convert better and reflect my brand identity.\n\n## Acceptance Criteria\n\n- [ ] Agent generates A+ Content modules based on product data and brand guidelines\n- [ ] Supported module types: comparison charts, standard text + image, brand story, feature highlights\n- [ ] Brand voice and visual style configurable per tenant\n- [ ] Preview rendering before submission to Amazon\n- [ ] Submit via A+ Content Management API with moderation handling\n- [ ] Track content approval status and resubmit if rejected with corrections\n- [ ] Performance tracking: conversion rate lift from A+ content vs standard listings\n\n## Epic: EP03 | Priority: P1 | Points: 13"
+  },
+  {
+    "title": "[STORY] Brand Store programmatic management",
+    "labels": ["user-story", "phase-3", "content-agent", "P1-high"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** brand-registered seller,\n**I want** the AI agent to manage my Amazon Brand Store pages programmatically,\n**So that** my storefront stays current with new products, seasonal themes, and optimized layouts without manual updates.\n\n## Acceptance Criteria\n\n- [ ] Retrieve and update Brand Store pages via Brand Stores Management API\n- [ ] Auto-add new products to relevant store categories\n- [ ] Seasonal layout recommendations based on shopping calendar\n- [ ] Section-level engagement metrics via Stores Analytics API\n- [ ] Submit store updates for moderation with status tracking\n- [ ] Store quality scoring aligned with Amazon's quality tiers\n\n## Epic: EP03 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP04: Inventory Management & Demand Forecasting",
+    "labels": ["epic", "phase-2", "inventory-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: Inventory Management & Demand Forecasting\n\n**Objective:** AI agent that monitors inventory levels, forecasts demand, and automates replenishment.\n\n**Phase:** 2 (Months 5-6)\n\n**Key Outcomes:**\n- Real-time inventory monitoring across FBA, FBM, and AWD\n- ML-powered demand forecasting with seasonality awareness\n- Automated replenishment plan generation\n- Cross-agent coordination (reduce ads when stock is low)\n\n**APIs:** FBA Inventory API, AWD API, Fulfillment Inbound API, Replenishment API, Notifications API"
+  },
+  {
+    "title": "[STORY] Real-time inventory monitoring and alerts",
+    "labels": ["user-story", "phase-2", "inventory-agent", "P0-critical"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to monitor my inventory levels in real-time across all fulfillment channels,\n**So that** I never run out of stock unexpectedly or have excess inventory tying up capital.\n\n## Acceptance Criteria\n\n- [ ] Real-time inventory data via FBA Inventory API and ITEM_INVENTORY_EVENT_CHANGE notifications\n- [ ] Dashboard showing inventory levels per ASIN, per fulfillment center\n- [ ] Configurable low-stock and overstock alert thresholds\n- [ ] Days-of-stock calculation based on current sell-through rate\n- [ ] Automatic notifications when stock reaches reorder point\n- [ ] Cross-agent event: publish LOW_STOCK event to advertising and pricing agents\n- [ ] Support for FBA, FBM, and AWD inventory tracking\n- [ ] Stranded inventory detection and resolution suggestions\n\n## Epic: EP04 | Priority: P0 | Points: 8"
+  },
+  {
+    "title": "[STORY] AI demand forecasting and replenishment planning",
+    "labels": ["user-story", "phase-2", "inventory-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to predict future demand and automatically generate replenishment plans,\n**So that** I maintain optimal stock levels without manual calculation.\n\n## Acceptance Criteria\n\n- [ ] Demand forecasting using historical sales data, seasonality, and trend analysis\n- [ ] Factor in upcoming promotions, advertising changes, and market events\n- [ ] Generate purchase order recommendations with quantities and timing\n- [ ] Auto-create inbound shipment plans to FBA/AWD via Fulfillment Inbound API\n- [ ] Lead time awareness per supplier\n- [ ] Configurable safety stock levels\n- [ ] Forecast accuracy tracking and model improvement over time\n- [ ] Slow-moving inventory detection with liquidation/removal recommendations\n\n## Epic: EP04 | Priority: P1 | Points: 13"
+  },
+  {
+    "title": "[EPIC] EP05: PPC Advertising Automation (SP + SB)",
+    "labels": ["epic", "phase-2", "advertising-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: PPC Advertising Automation\n\n**Objective:** AI agent that creates, manages, and optimizes Amazon PPC campaigns using the Ads MCP Server and Advertising API.\n\n**Phase:** 2 (Months 5-6)\n\n**Key Outcomes:**\n- End-to-end campaign creation via MCP natural-language prompts\n- Automated bid optimization based on ACoS/ROAS/TACoS targets\n- Keyword harvesting from Auto to Manual campaigns\n- Cross-agent coordination with inventory and pricing\n- Multi-marketplace campaign expansion\n\n**APIs:** Amazon Ads API (Campaign Management v3), Amazon Ads MCP Server, AMC, Marketing Stream, Unified Reporting API\n\n**Key Integration:** Amazon Ads MCP Server (open beta Feb 2026) reduces 3+ manual operations to single prompts."
+  },
+  {
+    "title": "[STORY] Campaign creation via Amazon Ads MCP Server",
+    "labels": ["user-story", "phase-2", "advertising-agent", "P0-critical"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to create complete Sponsored Products and Sponsored Brands campaigns via natural-language prompts,\n**So that** I can launch campaigns in seconds instead of spending 15-20 minutes per campaign in Campaign Manager.\n\n## Acceptance Criteria\n\n- [ ] Connect to Amazon Ads MCP Server with seller's API credentials\n- [ ] Create end-to-end SP campaigns (campaign + ad group + ads) via single MCP tool call\n- [ ] Create SB campaigns with brand store landing pages\n- [ ] Support automatic and manual targeting types\n- [ ] Set initial bids based on category benchmarks and seller's historical data\n- [ ] Budget allocation based on seller's total advertising budget and product priorities\n- [ ] Campaign creation requires seller approval before going live\n- [ ] Support campaign expansion to new marketplaces via MCP expansion tools\n- [ ] Error handling for MCP Server failures with graceful fallback to direct API\n\n## Technical Notes\n- MCP tools: cp_createCampaign, cp_updateCampaign, cp_listCampaigns\n- Ads MCP Server handles multi-step orchestration internally\n- SP data lookback: 95 days; SB/SD data lookback: 60 days\n- MCP Server has NO inventory visibility — must coordinate with Inventory Agent\n\n## Epic: EP05 | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[STORY] Automated bid optimization and keyword management",
+    "labels": ["user-story", "phase-2", "advertising-agent", "P0-critical"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to continuously optimize my bids and manage keywords based on performance data,\n**So that** my advertising spend generates maximum ROI without constant manual adjustment.\n\n## Acceptance Criteria\n\n- [ ] Real-time bid adjustment based on ACoS, ROAS, and TACoS targets\n- [ ] Keyword harvesting: extract converting search terms from Auto campaigns, create Manual campaigns\n- [ ] Negative keyword management: identify and add wasteful search terms as negatives\n- [ ] Dayparting support: adjust bids by time of day based on conversion patterns\n- [ ] Budget pacing: prevent overspend early in the day, reallocate to high-performing campaigns\n- [ ] Cross-agent signal: reduce bids when inventory agent reports low stock on an ASIN\n- [ ] Cross-agent signal: adjust bids when pricing agent reports non-competitive price\n- [ ] Performance reports via Amazon Marketing Stream for near-real-time data\n- [ ] Configurable optimization aggressiveness (conservative, balanced, aggressive)\n\n## Epic: EP05 | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[STORY] Advertising performance reporting and analytics",
+    "labels": ["user-story", "phase-2", "advertising-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** comprehensive advertising performance reports with actionable AI-generated insights,\n**So that** I can understand what's working, what's not, and make informed strategic decisions.\n\n## Acceptance Criteria\n\n- [ ] Dashboard with key metrics: spend, sales, ACoS, ROAS, TACoS, impressions, clicks, CTR, CPC\n- [ ] Campaign, ad group, keyword, and ASIN-level drill-down\n- [ ] AI-generated weekly performance summary with recommendations\n- [ ] Conversion path reporting using AMC data (30-day attribution window)\n- [ ] Unified reporting across SP, SB, and SD campaigns\n- [ ] Trend analysis with period-over-period comparison\n- [ ] Exportable reports (CSV, PDF)\n- [ ] Scheduled report delivery via email\n\n## Epic: EP05 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP06: Dynamic Pricing & Buy Box Optimization",
+    "labels": ["epic", "phase-1", "pricing-agent"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## Epic: Dynamic Pricing & Buy Box Optimization\n\n**Objective:** AI agent that implements intelligent, real-time pricing strategies to win the Buy Box while maintaining target margins.\n\n**Phase:** 1 (Months 3-4)\n\n**Key Outcomes:**\n- Real-time competitor price monitoring\n- Game-theory pricing to win Buy Box without price wars\n- Margin-aware pricing factoring in all fees and costs\n- Cross-agent coordination with advertising and inventory\n\n**APIs:** Product Pricing API, Notifications API (ANY_OFFER_CHANGED), Feeds API, Product Fees API"
+  },
+  {
+    "title": "[STORY] Real-time competitor price monitoring and repricing",
+    "labels": ["user-story", "phase-1", "pricing-agent", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to monitor competitor prices in real-time and adjust my prices to stay competitive,\n**So that** I win the Buy Box more often while maintaining my target profit margins.\n\n## Acceptance Criteria\n\n- [ ] Subscribe to ANY_OFFER_CHANGED and B2B_ANY_OFFER_CHANGED notifications for all seller ASINs\n- [ ] Track competitor prices, fulfillment types, and seller ratings\n- [ ] Apply game-theory pricing strategy to avoid destructive price wars\n- [ ] Calculate true cost per unit: product cost + FBA fees + shipping + advertising + referral fee\n- [ ] Enforce seller-configured minimum and maximum price boundaries\n- [ ] Reprice within configurable response time (default: < 5 minutes from competitor change)\n- [ ] Buy Box win rate tracking per ASIN\n- [ ] Surge pricing during high-demand periods\n- [ ] Markdown pricing for slow-moving or excess inventory\n- [ ] Cross-agent signal: pause ad spend when price is not competitive for Buy Box\n\n## Technical Notes\n- Use Product Pricing API for getItemOffers and getListingOffersBatch\n- Submit price changes via Feeds API (price feed) or Listings Items API (patchListingsItem)\n- Product Fees API for real-time fee calculations\n\n## Epic: EP06 | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[EPIC] EP07: Competitor Analysis & Market Intelligence",
+    "labels": ["epic", "phase-2", "analytics-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: Competitor Analysis & Market Intelligence\n\n**Objective:** AI agent that tracks competitors, analyzes market dynamics, and generates strategic intelligence.\n\n**Phase:** 2 (Months 7-8)\n\n**Key Outcomes:**\n- Competitor ASIN tracking (pricing, reviews, BSR, content changes)\n- Brand Analytics integration (search frequency rank, click share, conversion share)\n- New market entrant detection\n- Competitive landscape reports with actionable recommendations\n\n**APIs:** Catalog Items API, Product Pricing API, Data Kiosk API (Brand Analytics), Reports API"
+  },
+  {
+    "title": "[STORY] Competitor ASIN tracking and change detection",
+    "labels": ["user-story", "phase-2", "analytics-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to track my competitors' ASINs and alert me to significant changes,\n**So that** I can react quickly to competitor pricing changes, new reviews, listing updates, and BSR movements.\n\n## Acceptance Criteria\n\n- [ ] Seller can add competitor ASINs to watchlist (manual or AI-suggested)\n- [ ] Track: price changes, review count/rating changes, listing content modifications, BSR changes\n- [ ] Configurable alert thresholds (e.g., alert when competitor drops price by >10%)\n- [ ] AI-generated competitive response recommendations\n- [ ] Daily/weekly competitive landscape digest\n- [ ] New market entrant detection in seller's categories\n- [ ] Competitor ad placement monitoring (estimated share of voice)\n\n## Epic: EP07 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[STORY] Brand Analytics integration for market intelligence",
+    "labels": ["user-story", "phase-2", "analytics-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** brand-registered seller,\n**I want** the AI agent to analyze Brand Analytics data to identify keyword opportunities and market share trends,\n**So that** I can make data-driven decisions about product positioning and advertising strategy.\n\n## Acceptance Criteria\n\n- [ ] Integrate Data Kiosk API with Brand Analytics search terms schema\n- [ ] Track search frequency rank for target keywords over time\n- [ ] Monitor click share and conversion share vs competitors\n- [ ] Identify high-opportunity keywords: high search volume + low competition\n- [ ] Feed keyword intelligence to Listing Agent and Advertising Agent\n- [ ] Market share estimation per category/subcategory\n- [ ] Trend analysis: rising and declining search terms\n\n## Epic: EP07 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP08: Keyword Research & SEO Optimization",
+    "labels": ["epic", "phase-2", "listing-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: Keyword Research & SEO Optimization\n\n**Objective:** AI agent that performs comprehensive keyword research and continuously optimizes listing SEO.\n\n**Phase:** 2 (Months 7-8)\n\n**Key Outcomes:**\n- Reverse ASIN keyword extraction from competitors\n- Brand Analytics search term analysis\n- Keyword gap identification and prioritization\n- Continuous listing SEO optimization\n\n**APIs:** Data Kiosk API (Brand Analytics Search Terms), Catalog Items API, Advertising Keyword Recommendations API"
+  },
+  {
+    "title": "[STORY] Reverse ASIN keyword research and gap analysis",
+    "labels": ["user-story", "phase-2", "listing-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to extract high-performing keywords from competitor listings and identify gaps in my keyword strategy,\n**So that** my listings rank for all relevant search terms customers use.\n\n## Acceptance Criteria\n\n- [ ] Extract indexed keywords from top 10 competitor ASINs per product\n- [ ] Compare seller's indexed keywords against competitor keyword profiles\n- [ ] Identify keyword gaps: terms competitors rank for but seller doesn't\n- [ ] Prioritize keywords by search volume, relevance, and competition level\n- [ ] Generate keyword integration recommendations for listing content\n- [ ] Auto-update backend search terms with high-priority missing keywords\n- [ ] Feed keyword data to Advertising Agent for campaign targeting\n- [ ] Weekly keyword performance report with ranking changes\n\n## Epic: EP08 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP09: Promotions & Deals Management",
+    "labels": ["epic", "phase-3", "promotions-agent"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## Epic: Promotions & Deals Management\n\n**Objective:** AI agent that creates and optimizes promotional campaigns, deals, and coupons.\n\n**Phase:** 3 (Months 11-12)\n\n**Key Outcomes:**\n- Lightning Deals, Best Deals, and Coupon management\n- Promotional calendar optimization\n- ROI tracking including halo effects on organic ranking\n- Coordination with inventory for deal stock requirements\n\n**APIs:** Promotions API, Coupons API, Feeds API"
+  },
+  {
+    "title": "[STORY] Automated deal creation and promotional calendar",
+    "labels": ["user-story", "phase-3", "promotions-agent", "P2-medium"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to recommend and create optimal promotional deals based on my inventory, margin, and market data,\n**So that** I can boost sales velocity and organic ranking at the right times with the right discounts.\n\n## Acceptance Criteria\n\n- [ ] Agent analyzes historical deal performance and category seasonality\n- [ ] Recommends deal type (Lightning Deal, Best Deal, Coupon), timing, and discount depth\n- [ ] Coordinates with Inventory Agent to verify sufficient stock for promotional period\n- [ ] Coordinates with Pricing Agent to set optimal pre-deal and post-deal prices\n- [ ] Creates deals programmatically with seller approval\n- [ ] Tracks promotional ROI: direct sales lift + halo effect on organic ranking + review velocity\n- [ ] Promotional calendar view showing planned and active deals\n- [ ] Budget tracking and alerts for promotional spend\n\n## Epic: EP09 | Priority: P2 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP10: Order Management & Customer Service",
+    "labels": ["epic", "phase-2", "order-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: Order Management & Customer Service\n\n**Objective:** AI agent that automates order processing, customer communications, and review solicitation.\n\n**Phase:** 2 (Months 7-8)\n\n**Key Outcomes:**\n- Automated order confirmation and tracking updates\n- AI-drafted customer messages within Amazon's guidelines\n- Review solicitation at optimal timing\n- Account health monitoring for order-related metrics\n\n**APIs:** Orders API, Messaging API, Solicitations API, Customer Feedback API"
+  },
+  {
+    "title": "[STORY] Automated order processing and customer messaging",
+    "labels": ["user-story", "phase-2", "order-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to handle routine order processing and customer communications automatically,\n**So that** I meet Amazon's response time requirements and maintain high customer satisfaction without manual effort.\n\n## Acceptance Criteria\n\n- [ ] Subscribe to ORDER_CHANGE notifications for real-time order updates\n- [ ] Auto-confirm shipments and update tracking information\n- [ ] AI-draft customer messages for common scenarios (shipping delays, order issues)\n- [ ] Messages sent via Messaging API within Amazon's communication guidelines\n- [ ] Configurable auto-response rules vs human review requirements\n- [ ] Auto-process returns/refunds below configurable threshold (e.g., < $25)\n- [ ] Escalate complex issues (A-to-Z claims, high-value disputes) to human\n- [ ] Solicit reviews via Solicitations API at optimal timing (post-delivery + satisfaction signal)\n- [ ] Customer satisfaction metrics tracking\n\n## Epic: EP10 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP11: Financial Analytics & Profitability Tracking",
+    "labels": ["epic", "phase-2", "analytics-agent"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## Epic: Financial Analytics & Profitability Tracking\n\n**Objective:** AI agent that provides real-time profitability analysis and financial intelligence.\n\n**Phase:** 2 (Months 7-8)\n\n**Key Outcomes:**\n- SKU-level true profitability (including all fees, ads, returns)\n- TACoS tracking and optimization\n- Automated P&L reports per product, brand, and marketplace\n- Cash flow projection and reorder budget recommendations\n\n**APIs:** Finances API, Reports API, Product Fees API, Data Kiosk API"
+  },
+  {
+    "title": "[STORY] SKU-level profitability dashboard",
+    "labels": ["user-story", "phase-2", "analytics-agent", "P1-high"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** to see true profit/loss for every SKU factoring in all costs,\n**So that** I can identify which products are making money and which are draining resources.\n\n## Acceptance Criteria\n\n- [ ] Calculate per-SKU profitability: revenue - COGS - FBA fees - referral fees - ad spend - returns - shipping\n- [ ] Real-time financial data via Finances API and ITEM_SALES_EVENT_CHANGE notifications\n- [ ] TACoS (Total Advertising Cost of Sale) calculation per SKU\n- [ ] Automated P&L reports: daily, weekly, monthly per product/brand/marketplace\n- [ ] Identify unprofitable SKUs with AI-generated recommendations (price increase, cut ads, discontinue)\n- [ ] Cash flow projection based on sales velocity, pending settlements, and planned purchases\n- [ ] Fee change impact analysis (alert when Amazon changes fee structure)\n- [ ] Export to CSV/Excel and integration with accounting software\n\n## Epic: EP11 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP12: Compliance & Account Health Monitoring",
+    "labels": ["epic", "phase-3", "compliance-agent"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## Epic: Compliance & Account Health Monitoring\n\n**Objective:** AI agent that proactively monitors account health, policy compliance, and regulatory requirements.\n\n**Phase:** 3 (Months 9-10)\n\n**Key Outcomes:**\n- Continuous account health monitoring (ODR, late shipment rate, etc.)\n- Product safety documentation compliance\n- Multi-marketplace regulatory compliance (EPR, VAT, etc.)\n- Proactive issue detection and resolution\n\n**APIs:** Sellers API, Reports API, Notifications API, Listings Restrictions API"
+  },
+  {
+    "title": "[STORY] Proactive account health monitoring and alerts",
+    "labels": ["user-story", "phase-3", "compliance-agent", "P1-high"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to continuously monitor my account health metrics and proactively resolve issues,\n**So that** my account is never at risk of suspension due to performance problems.\n\n## Acceptance Criteria\n\n- [ ] Monitor Order Defect Rate (ODR), Late Shipment Rate, Pre-Fulfillment Cancellation Rate\n- [ ] Alert when any metric approaches warning threshold (before Amazon flags it)\n- [ ] Product safety documentation compliance checking\n- [ ] Listing restriction checks via Listings Restrictions API before new product listings\n- [ ] Auto-ensure products meet compliance in all selling countries\n- [ ] EPR (Extended Producer Responsibility) declaration management for EU markets\n- [ ] Proactive IP complaint detection and response recommendations\n- [ ] Account health trend dashboard with risk scoring\n\n## Epic: EP12 | Priority: P1 | Points: 8"
+  },
+  {
+    "title": "[EPIC] EP13: Multi-Marketplace Expansion",
+    "labels": ["epic", "phase-3", "expansion"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## Epic: Multi-Marketplace Expansion\n\n**Objective:** Enable sellers to expand to new Amazon marketplaces with AI-assisted localization.\n\n**Phase:** 3 (Months 11-12)\n\n**Key Outcomes:**\n- Market demand analysis across NA, EU, FE regions\n- AI-powered listing translation with cultural localization\n- Cross-marketplace ad campaign replication via MCP\n- Per-marketplace performance monitoring\n\n**APIs:** All SP-APIs (multi-region), Ads MCP Server (region expansion tools)"
+  },
+  {
+    "title": "[STORY] AI-powered marketplace expansion with localized listings",
+    "labels": ["user-story", "phase-3", "expansion", "P2-medium"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** the AI agent to help me expand to new Amazon marketplaces with properly localized listings and campaigns,\n**So that** I can grow my business internationally without hiring native-language specialists.\n\n## Acceptance Criteria\n\n- [ ] Market demand analysis for seller's product categories across target marketplaces\n- [ ] AI-powered listing translation with cultural localization (not just word-for-word)\n- [ ] Marketplace-specific compliance checks (VAT, product regulations, labeling)\n- [ ] Currency conversion and pricing strategy per marketplace\n- [ ] Replicate successful ad campaigns to new marketplaces via MCP expansion tools\n- [ ] Per-marketplace performance dashboards\n- [ ] Unified cross-marketplace view for sellers operating in multiple regions\n\n## Epic: EP13 | Priority: P2 | Points: 13"
+  },
+  {
+    "title": "[EPIC] EP14: Product Launch Orchestration",
+    "labels": ["epic", "phase-3", "orchestrator"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## Epic: Product Launch Orchestration\n\n**Objective:** Coordinate all agents for a seamless, automated product launch sequence.\n\n**Phase:** 3 (Month 12)\n\n**Key Outcomes:**\n- Coordinated multi-agent launch sequence\n- Launch velocity monitoring and dynamic optimization\n- Post-launch analysis and recommendations\n\nThis is the ultimate demonstration of cross-agent coordination — the feature that no point solution can provide."
+  },
+  {
+    "title": "[STORY] Coordinated multi-agent product launch sequence",
+    "labels": ["user-story", "phase-3", "orchestrator", "P2-medium"],
+    "milestone": "Phase 3: Advanced Features (Months 9-12)",
+    "body": "## User Story\n\n**As a** seller launching a new product,\n**I want** the AI orchestrator to coordinate all agents in a synchronized launch sequence,\n**So that** my product launch is optimized across listing, pricing, advertising, and inventory from day one.\n\n## Acceptance Criteria\n\n- [ ] Launch workflow: Listing Agent creates optimized listing → Inventory Agent verifies stock → Pricing Agent sets launch price → Advertising Agent activates PPC campaigns → Promotions Agent schedules launch deals\n- [ ] Configurable launch timeline with pre-launch, launch, and post-launch phases\n- [ ] Real-time launch velocity monitoring (orders/day, BSR trajectory, review acquisition)\n- [ ] Dynamic adjustment: increase ad spend if velocity is below target, decrease if stock is running low\n- [ ] Post-launch analysis report: what worked, what to optimize, projected trajectory\n- [ ] Launch playbook templates for different product types and categories\n- [ ] Human approval gates at each phase transition\n\n## Epic: EP14 | Priority: P2 | Points: 13"
+  },
+  {
+    "title": "[STORY] Orchestrator agent for cross-domain coordination",
+    "labels": ["user-story", "phase-2", "orchestrator", "P0-critical"],
+    "milestone": "Phase 2: Core Agents (Months 5-8)",
+    "body": "## User Story\n\n**As a** platform,\n**I want** a central orchestrator agent that coordinates workflows across all specialist agents,\n**So that** business decisions account for cross-domain context (e.g., inventory affects pricing affects advertising).\n\n## Acceptance Criteria\n\n- [ ] Orchestrator receives events from all specialist agents via event bus\n- [ ] Implements cross-agent workflows: low stock → reduce ads + increase price\n- [ ] Resolves conflicts between agent recommendations (e.g., pricing agent wants lower price, margin agent wants higher)\n- [ ] Manages human approval queue: prioritizes, deduplicates, and batches approval requests\n- [ ] Maintains per-tenant strategy context: seller's goals, risk tolerance, growth vs profit mode\n- [ ] Decision audit trail: log every orchestration decision with reasoning\n- [ ] Fallback handling: graceful degradation if a specialist agent is unavailable\n- [ ] Configurable orchestration rules per tenant\n\n## Epic: EP05/Cross-cutting | Priority: P0 | Points: 13"
+  },
+  {
+    "title": "[STORY] Amazon Ads API credential management and MCP connection",
+    "labels": ["user-story", "phase-1", "infrastructure", "P0-critical"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** to connect my Amazon Advertising account to the platform,\n**So that** the advertising agent can manage my PPC campaigns.\n\n## Acceptance Criteria\n\n- [ ] OAuth flow for Amazon Ads API authorization\n- [ ] Secure storage of Ads API refresh tokens (per-tenant encrypted)\n- [ ] Advertiser profile discovery and selection (support multiple profiles/brands)\n- [ ] MCP Server connection setup with seller's credentials\n- [ ] Region auto-routing (NA, EU, FE)\n- [ ] Connection health monitoring and token refresh management\n- [ ] Graceful handling when MCP Server is unavailable (fallback to direct API)\n\n## Epic: EP01 | Priority: P0 | Points: 5"
+  },
+  {
+    "title": "[STORY] Seller preference and strategy configuration",
+    "labels": ["user-story", "phase-1", "frontend", "P1-high"],
+    "milestone": "Phase 1: Foundation (Months 1-4)",
+    "body": "## User Story\n\n**As a** seller,\n**I want** to configure my business goals, risk tolerance, and agent behavior preferences,\n**So that** the AI agents make decisions aligned with my strategy.\n\n## Acceptance Criteria\n\n- [ ] Business mode selector: growth mode (maximize revenue) vs profit mode (maximize margins)\n- [ ] Per-agent autonomy levels: full auto, auto with notifications, approval required, disabled\n- [ ] Pricing preferences: min/max margins, MAP compliance, competitor response aggressiveness\n- [ ] Advertising preferences: target ACoS/ROAS, daily budget limits, marketplace priorities\n- [ ] Brand voice configuration for listing content generation\n- [ ] Notification preferences: email, in-app, frequency\n- [ ] Settings apply across all agents via shared tenant configuration\n\n## Epic: EP01 | Priority: P1 | Points: 5"
+  }
+]
