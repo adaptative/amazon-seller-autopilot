@@ -1,274 +1,547 @@
-# Seller Autopilot — Master Design Brief: Mission Control
+# Seller Autopilot — Master Design Brief: Joyful Tech
 
 > **This document is the CONTEXT PREAMBLE for every mockup prompt.**
-> Paste the relevant sections BEFORE your screen-specific prompt in Stitch, v0, or Lovable.
+> Extracted from the approved Stitch reference (`docs/design/stitch-audit/v2-approved-reference.html`).
+> Every screen in the application MUST match this aesthetic.
 
 ---
 
-## Stitch Output Audit (v1 Failures — What Went Wrong)
+## 1. Creative North Star: "The Joyful Copilot"
 
-Our first Stitch generation ignored every design constraint and produced a consumer-grade, playful, light-mode page. Below are the 13 documented violations and the hardened guardrails added to prevent recurrence:
+Seller Autopilot is a **friendly, approachable AI companion** that makes the complexity of Amazon selling feel light and manageable. The aesthetic is **bright, playful, warm, and encouraging** — like a brilliant assistant who also happens to have a great personality.
 
-| # | What Stitch Generated | What We Specified | Guardrail Added |
-|---|----------------------|-------------------|-----------------|
-| 1 | Light mode bg #f0f9ff | Dark surface #0d1322 | HARD CONSTRAINT: "dark background #0d1322" repeated 3x in prompt |
-| 2 | Fredoka whimsical font | Inter + JetBrains Mono only | EXPLICIT: "do NOT use Fredoka, Poppins, or any rounded/playful font" |
-| 3 | Cartoon robot with eyes/smile | No illustrations | EXPLICIT: "ZERO illustrations, ZERO characters, ZERO mascots" |
-| 4 | "Woohoo!", "login party", "nudge" | Professional language | EXPLICIT: "NEVER use: Woohoo, party, magic, nudge, Oops, yay" |
-| 5 | border-4, border-dashed | No-Line Rule | EXPLICIT: "ZERO visible borders on cards or layout sections" |
-| 6 | rounded-3xl (24px) | 4-8px max | EXPLICIT: "border-radius: 8px MAXIMUM. Never rounded-2xl or rounded-3xl" |
-| 7 | shadow-2xl, 3D button shadow | Ambient shadows only | EXPLICIT: "NEVER shadow-2xl. NEVER 3D push-button shadows" |
-| 8 | Gradient blobs, blur-3xl clouds | No decoration | EXPLICIT: "ZERO background blobs, ZERO blur clouds, ZERO mix-blend" |
-| 9 | #3b82f6, #f472b6 | Our token palette | INLINE hex values in every element description |
-| 10 | No monospace on email | JetBrains Mono for data | EXPLICIT: "email address in monospace font-family" |
-| 11 | Flat white/blue | 7-tier surface hierarchy | Surface hex values embedded directly in element specs |
-| 12 | 4s infinite float bounce | Purposeful-only animation | EXPLICIT: "ZERO floating/bouncing animations" |
-| 13 | Star/celebration icons | Thin-stroke functional only | EXPLICIT: "ZERO decorative icons — star, celebration, sparkle, favorite" |
+We reject the dark, clinical "Bloomberg Terminal" approach. Instead, we embrace the idea that **professional tools can be delightful**. Sellers already spend their days in the anxiety-inducing UX of Amazon Seller Central. Our product is the antidote — a place that feels good to open, celebrates wins, and makes hard tasks feel easy.
 
----
+### Brand Personality
+| Trait | Expression |
+|-------|-----------|
+| **Joyful** | Bright sky-blue backgrounds, playful character mascot, celebratory language |
+| **Warm** | Fredoka rounded typeface, pink accents, soft gradients, encouraging copy |
+| **Trustworthy** | Clean layouts, clear data, blue primary — reliable but not boring |
+| **Playful** | 3D push buttons, floating animations, decorative sparkle icons, dashed borders |
+| **Smart** | Data identifiers styled distinctly, clear hierarchy, professional when it matters |
 
-## 1. Creative North Star: "The High-Density Architect"
+### Visual Benchmarks (Looks Like)
+- **Notion** (warmth + approachability) crossed with **Duolingo** (character + celebration)
+- **Linear** (clean structure) crossed with **Headspace** (calming, encouraging)
+- **Stripe** (data clarity) crossed with **Figma** (personality + delight)
+- **Lottie / Rive animations** — playful micro-interactions that reward user actions
 
-This is a **precision instrument** for high-revenue Amazon sellers. NOT a consumer app. NOT playful. NOT whimsical. Think **aerospace Mission Control meets Bloomberg Terminal meets Linear.app**.
-
-**Dark-first. Dense. Editorial. Calm. Authoritative.**
-
----
-
-## 2. HARD CONSTRAINTS (Paste These First in Every Prompt)
-
-These constraints override all AI design tool defaults. Repeat them at the top AND bottom of every prompt.
-
-```
-=== HARD CONSTRAINTS — VIOLATING ANY OF THESE REJECTS THE OUTPUT ===
-
-DARK MODE ONLY:
-- Page background MUST be #0d1322 (near-black navy). NEVER white, NEVER light blue, NEVER #f0f9ff.
-- ALL surfaces are dark. The lightest surface is #33394a. There is NO white background anywhere.
-- This is a DARK application. Dark. Dark. Dark. Not light mode. Not white. Dark.
-
-NO ILLUSTRATIONS / NO CHARACTERS:
-- ZERO illustrations. ZERO cartoon characters. ZERO mascots. ZERO robots with faces.
-- ZERO decorative SVGs. ZERO whimsical drawings. ZERO anthropomorphic elements.
-- If the design needs a visual, use a THIN-STROKE (1.5px) geometric ICON only.
-
-NO PLAYFUL LANGUAGE:
-- NEVER use: "Woohoo", "yay", "party", "magic", "nudge", "zipped", "Oops", "awesome", "bam"
-- Tone is PROFESSIONAL and DIRECT: "Check your email" not "Woohoo! It's on its way!"
-- "Back to sign in" not "Back to the login party"
-- "Resend link" not "Give it another nudge!"
-
-NO PLAYFUL FONTS:
-- Font is Inter (variable) ONLY. NEVER Fredoka, Poppins, Comic Sans, Nunito, or any rounded/bouncy font.
-- JetBrains Mono for data identifiers (emails, ASINs, prices) ONLY.
-
-NO HEAVY BORDERS:
-- ZERO visible borders on cards or layout blocks. No border-2, No border-4.
-- If a border is absolutely needed: #43474e at 15% opacity ONLY.
-- No dashed borders. No dotted borders.
-
-BORDER-RADIUS 8px MAXIMUM:
-- border-radius: 8px on cards, buttons, inputs.
-- NEVER rounded-2xl (16px). NEVER rounded-3xl (24px). NEVER rounded-full on containers.
-- 4px on chips/badges (sharp, technical).
-
-NO MATERIAL / 3D SHADOWS:
-- NEVER shadow-2xl. NEVER shadow-lg on cards.
-- NEVER 3D push-button effects (shadow-[0_10px_0_rgb(...)]).
-- ONLY ambient shadow on floating elements: box-shadow: 0 20px 40px rgba(0,0,0,0.4)
-
-NO DECORATIVE BACKGROUNDS:
-- ZERO gradient blobs. ZERO blur-3xl clouds. ZERO mix-blend-multiply effects.
-- ZERO background animations (drifting, floating).
-- Background is FLAT SOLID color #0d1322. Period.
-
-NO DECORATIVE ICONS:
-- ZERO star, sparkle, celebration, favorite, rocket, fire emoji-style icons.
-- Icons must be thin-stroke (1.5px), functional, monochrome.
-
-NO FLOATING/BOUNCE ANIMATIONS:
-- ZERO float, bounce, drift, or pulse animations on page elements.
-- Animation is reserved for: agent status dots (subtle pulse), skeleton loaders (shimmer), and micro-interactions (hover, focus).
-
-===
-```
+### Anti-Patterns (Must NOT Look Like)
+- ❌ Amazon Seller Central (anxiety-inducing, orange alerts, dated)
+- ❌ Bloomberg Terminal / dark "hacker" dashboards (intimidating, cold)
+- ❌ Generic Bootstrap admin templates (soulless, no personality)
+- ❌ Enterprise B2B grey-on-grey (boring, forgettable)
+- ❌ Crypto/fintech dark neon (try-hard, untrustworthy)
 
 ---
 
-## 3. Surface Hierarchy (Tonal Layering)
+## 2. Application Context
 
-Depth comes from background color shifts between tiers, NOT from borders or shadows.
+**Seller Autopilot** is a B2B SaaS for Amazon sellers. AI agents handle listings, pricing, ads, inventory, and compliance. The seller focuses on strategy while the AI handles execution.
 
+**Users:** Amazon sellers ($10K-$500K/month), ages 28-55. They're stressed from Amazon's complexity. Our UI is the relief — the place where things just work and progress feels celebratory.
+
+**Emotional Journey:**
 ```
-TOKEN                          HEX         USE
-surface                        #0d1322     Page background (deepest)
-surface_container_lowest       #111725     Sunken/utility areas
-surface_container_low          #151b2b     Sidebar, navigation panels
-surface_container              #191f2f     Content cards, primary containers
-surface_container_high         #1e2435     Elevated cards, inputs background
-surface_container_highest      #2f3445     Popovers, active states, inner cards
-surface_bright                 #33394a     Focused widgets, hover states
+BEFORE:  Overwhelmed → Anxious → Reactive → Exhausted
+AFTER:   Supported → Confident → Celebratory → In Control
 ```
 
-Cards (`#191f2f`) sit on page (`#0d1322`). The color difference IS the card edge. No border needed.
+The mascot character is their **AI copilot** — friendly, always working, always celebrating wins with them.
 
 ---
 
-## 4. Color Tokens
+## 3. Color System
 
+### Primary Palette
 ```
-primary                 #abc9f2     Text accents, links, focus states
-primary_container       #1b3a5c     Gradient button end, high-emphasis
-on_primary              #0e305a     Text on primary surfaces
-secondary               #a0caff     Focus rings, secondary interactive
-tertiary                #c8bfff     Tags, tertiary accents
-on_surface              #e1e2e8     Primary text (light on dark)
-on_surface_variant      #c3c6cf     Muted text, labels, placeholders
-outline                 #8d9199     Inactive borders (when required)
-outline_variant         #43474e     Ghost borders (15% opacity only)
-
-Semantic:
-success                 #7dd3a0     Positive (with #2e4a3e container)
-warning                 #f59e0b     Attention needed
-error                   #ffb4ab     Critical (with #93000a container)
-
-CTA gradient:           linear-gradient(135deg, #abc9f2, #1b3a5c)
-Glassmorphism:          rgba(30,36,53,0.80) + backdrop-filter: blur(12px)
+TOKEN            HEX         TAILWIND           ROLE
+─────────────────────────────────────────────────────────────────────
+primary-pop      #3b82f6     blue-500           Primary buttons, links, headings, character accent,
+                                                 logo, interactive elements. The hero color.
+accent-joy       #f472b6     pink-400           Secondary accent: resend links, decorative elements,
+                                                 antenna, heart icons, selection highlight
+sky-joy          #e0f2fe     sky-100            Top of page gradient, sky feeling
+surface          #ffffff     white              Card backgrounds, character body, input surfaces
+on-surface       #1e293b     slate-800          Primary text — headings, body, high-emphasis
 ```
 
-### Agent Colors (Status Dots + Left-Border Only)
+### Extended Palette
 ```
-Listing #a0caff | Inventory #7dd3a0 | Advertising #f4a261
-Pricing #c8bfff | Analytics #5eead4 | Compliance #8d9199 | Orchestrator #f9a8d4
+page-bg          #f0f9ff     sky-50 variant     Page background (lightest sky)
+text-muted       #475569     slate-600          Body text, descriptions
+text-lighter     #94a3b8     slate-400          Footer text, timestamps, helper text
+blue-dark        #1e3a8a     blue-900           3D button shadow base
+yellow-pop       #facc15     yellow-400         Star decoration, celebration accents
+pink-soft        #fce7f3     pink-50            Soft background blobs
+blue-light       #dbeafe     blue-100           Background blobs, soft decorations
+```
+
+### Page Background Treatment (CRITICAL — Defines the Entire Feel)
+The page is NEVER a flat color. It's a living, breathing sky:
+```
+Layer 1 (base):     bg-gradient-to-b from-[#e0f2fe] via-[#f0f9ff] to-[#ffffff]
+Layer 2 (clouds):   Drifting white blobs (bg-white/60, rounded-full, blur-3xl) — slow 15s animation
+Layer 3 (blue):     Bottom-left blue blob (bg-blue-100, 600px, opacity-40, mix-blend-multiply, blur-3xl)
+Layer 4 (pink):     Top-right pink blob (bg-pink-50, 500px, opacity-50, mix-blend-multiply, blur-3xl)
+Layer 5 (yellow):   Bottom-left subtle (bg-yellow-100, 48px, blur-2xl, opacity-40)
+Layer 6 (blue):     Bottom-right subtle (bg-primary-pop/10, blur-3xl, opacity-30)
+```
+
+This layered gradient-blob background is used on **all auth screens, onboarding, marketing pages, and empty states.** Dashboard and data-heavy screens use a simplified version (just Layer 1 gradient, no blobs).
+
+### Selection Color
+```css
+selection: bg-accent-joy/30  /* Pink-tinted text selection across the app */
 ```
 
 ---
 
-## 5. Typography
+## 4. Typography
 
+### Dual Font System
 ```
-UI Font:      Inter (variable) — NEVER any other font
-Data Font:    JetBrains Mono — emails, ASINs, SKUs, prices, IDs
+Whimsical Voice:  Fredoka (400/600/700) — for headlines, buttons, logo, celebration moments
+                  This font makes everything feel friendly and approachable.
+                  Google Fonts: family=Fredoka:wght@400;600;700
 
-Display       3.5rem / 600  Inter    -0.02em     Hero numbers
-Headline L    2rem / 600    Inter    -0.02em     Page titles
-Headline M    1.5rem / 600  Inter    -0.02em     Section/card headings
-Title         1.125rem / 500 Inter   normal      Subheadings
-Body          0.875rem / 400 Inter   normal      Default text
-Body Sm       0.8125rem / 400 Inter  normal      Table cells, dense content
-Label L       0.75rem / 500 Inter    0.05em CAPS Column headers, metadata labels
-Label S       0.6875rem / 500 Inter  0.05em CAPS Tags, timestamps, micro-labels
-Mono Data     0.8125rem / 400 JBMono normal      ASINs, $24.99, B08XYZ, seller@email.com
+Body Voice:       Inter (400/500/600) — for body text, UI chrome, data, descriptions
+                  Clean and professional when it matters.
+                  Google Fonts: family=Inter:wght@400;500;600
 ```
 
-- Headlines use tight letter-spacing (-0.02em) for a "newsroom" compact feel
-- Labels are ALL-CAPS with 0.05em tracking in `on_surface_variant` (#c3c6cf)
-- Numbers use `font-variant-numeric: tabular-nums`
-- Sentence case everywhere EXCEPT labels
+### Type Scale
+```
+ROLE              SIZE               WEIGHT   FONT      USAGE
+─────────────────────────────────────────────────────────────────────
+Display Hero      text-6xl/text-7xl  700      Fredoka   "Woohoo!" celebration headings
+                  (3.75rem → 4.5rem)                    tracking-tight, leading-tight
+
+Headline          text-3xl/text-4xl  700      Fredoka   Page titles, section hero text
+                  (1.875rem → 2.25rem)
+
+Section Head      text-2xl           600      Fredoka   Card section headers, widget titles
+                  (1.5rem)
+
+Button Text       text-xl            700      Fredoka   Primary CTA buttons
+                  (1.25rem)
+
+Logo Text         text-lg            700      Fredoka   "Seller Autopilot" in footer/header
+                  (1.125rem)
+
+Body Large        text-lg/text-xl    500      Inter     Descriptions, subtitles
+                  (1.125rem → 1.25rem)
+
+Body              text-base          400      Inter     Default text, form labels
+                  (1rem)
+
+Body Small        text-sm            400/500  Inter     Footer links, helper text, timestamps
+                  (0.875rem)
+
+Data Identifier   text-base          700      Inter     Emails, ASINs — styled in primary-pop
+                  (1rem)                               with dashed border badge treatment
+```
+
+### Typography Rules
+- **Fredoka for everything the user FEELS** — headings, buttons, celebration text, logo
+- **Inter for everything the user READS** — body text, data, descriptions, form labels
+- **Data identifiers** (emails, ASINs, SKUs) get a special badge: `inline-block px-2 py-1 bg-white border-2 border-dashed border-primary-pop/30 rounded-lg text-primary-pop font-bold`
+- **tracking-tight** on Display and Headline scales
+- **leading-relaxed** on body text for comfortable reading
+- **Hero numbers** (revenue, profit) use Fredoka at Display scale
+
+---
+
+## 5. The Mascot Character
+
+A core brand element — a **friendly robot/mail envelope character** that appears on:
+- Auth screens (success states, error states, loading)
+- Empty states (waving, pointing, encouraging)
+- Celebration moments (confetti, sparkles, floating)
+- Onboarding (guiding, explaining)
+
+### Character Construction (CSS/SVG)
+```
+Body:            w-64 h-48, bg-white, border-4 border-primary-pop, rounded-3xl, shadow-2xl
+Upper half:      bg-blue-50, border-b-4 border-primary-pop/20 (envelope flap)
+Eyes:            Two w-4 h-4 bg-slate-800 rounded-full circles, gap-6
+Smile:           w-8 h-4 border-b-4 border-slate-800 rounded-full (curved bottom border)
+Arms:            Two w-16 h-4 bg-primary-pop rounded-full — left rotated 12°, right rotated -12°
+Antenna:         w-1 h-12 bg-slate-400 vertical line, topped with w-12 h-2 bg-accent-joy pill
+Heart badge:     Top-right corner, border-2 border-accent-joy/40, favorite icon
+Shadow:          drop-shadow(0 20px 30px rgba(59, 130, 246, 0.3))
+Animation:       float — translateY(-20px) rotate(2deg), 4s ease-in-out infinite
+```
+
+### Decorative Sparkle Icons (Around Character)
+```
+Star:            material-symbols star, text-yellow-400, text-4xl, top-left
+Sparkle:         material-symbols auto_awesome, text-primary-pop, text-3xl, top-right
+Celebration:     material-symbols celebration, text-pink-400, text-3xl, bottom-center
+```
+
+### When to Use the Character
+- ✅ Auth success/error states
+- ✅ Empty states ("No campaigns yet" — character waving)
+- ✅ Onboarding wizard steps
+- ✅ Achievement celebrations ("Buy Box won!", "ACoS target hit!")
+- ❌ NOT on data-heavy dashboard screens (too distracting from data)
+- ❌ NOT on tables or analytics (the data is the star there)
 
 ---
 
 ## 6. Component Patterns
 
-**Cards:** `#191f2f` bg, ZERO border, 8px radius, 16px padding. On `#0d1322` page.
-**Stat Cards:** Display 3.5rem hero number + Label CAPS above + trend pill + optional sparkline.
-**Agent Cards:** 3px left-border in agent color + dot + approve/reject.
-**Buttons:**
-- Primary: `linear-gradient(135deg, #abc9f2, #1b3a5c)`, text `#0e305a`, 8px radius, 44px height
-- Secondary: `#2f3445` bg, no border, text `#e1e2e8`
-- Ghost: transparent, text `#e1e2e8`, bg appears on hover (`#1e2435`)
-- NEVER 3D shadows on buttons. NEVER rounded-2xl on buttons.
+### Primary CTA Button (The "3D Push Button" — Signature Element)
+```css
+/* This tactile, pushable button is a brand signature. Use on all primary CTAs. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;                              /* px-10 py-5 */
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.25rem;                              /* text-xl */
+  font-weight: 700;
+  color: white;
+  background-color: #3b82f6;                       /* primary-pop */
+  border-radius: 16px;                             /* rounded-2xl */
+  box-shadow: 0 10px 0 rgb(30, 58, 138);          /* 3D depth — blue-900 */
+  transition: all 200ms;
+}
+.btn-primary:hover {
+  background-color: #1e293b;                       /* slate-900 */
+  box-shadow: 0 5px 0 rgb(0, 0, 0);               /* Compressed shadow */
+  transform: translateY(5px);                      /* Pushed down */
+}
+.btn-primary:active {
+  box-shadow: none;                                /* Fully pressed */
+  transform: translateY(8px);
+}
+```
 
-**Inputs:** 44px height, 8px radius, `#1e2435` bg, floating label, ghost border (`#43474e` at 15%), `#a0caff` on focus.
-**Tables:** ZERO dividers, 4px row gap, Label CAPS headers, Body Sm content, hover = `#151b2b`.
-**Chips:** 4px radius (sharp), 24px height, token-colored.
-**Empty States:** Thin-stroke icon 48px + headline + one sentence + CTA button. ZERO illustrations.
+### Secondary Button
+```
+Background: surface (#ffffff) or transparent
+Border: 2px solid primary-pop/30
+Text: text-primary-pop, font-bold, Inter
+Radius: rounded-xl (12px)
+Hover: bg-sky-joy (#e0f2fe)
+```
+
+### Text Links
+```
+Primary link:    text-primary-pop (#3b82f6), font-bold, hover:underline, underline-offset-4
+Secondary link:  text-accent-joy (#f472b6), font-bold, hover:underline, underline-offset-4
+Muted link:      text-slate-400, hover:text-primary-pop, transition-colors
+```
+
+### Input Fields
+```
+Background:      bg-white (surface)
+Border:          border-2 border-slate-200 (inactive)
+                 border-2 border-primary-pop (focused)
+Radius:          rounded-xl (12px)
+Height:          48px (py-3 px-4)
+Font:            Inter, text-base
+Label:           Floating or above-field, Inter text-sm font-medium text-slate-600
+Shadow:          shadow-sm on focus (gentle lift)
+```
+
+### Cards (Dashboard Widgets)
+```
+Background:      bg-white (surface)
+Border:          border border-slate-100
+Radius:          rounded-2xl (16px)
+Padding:         p-6 (24px)
+Shadow:          shadow-lg (gentle, warm)
+Hover:           shadow-xl (slight lift)
+Header:          Fredoka text-lg font-bold text-on-surface
+```
+
+### Data Badge (For ASINs, Emails, SKUs)
+```html
+<span class="inline-block px-2 py-1 bg-white border-2 border-dashed border-primary-pop/30
+             rounded-lg text-primary-pop font-bold">B08XYZ123</span>
+```
+
+### Stat Cards
+```
+Number:          Fredoka, text-4xl font-bold text-on-surface
+Label:           Inter, text-sm text-slate-400 uppercase tracking-wider
+Trend:           Positive: text-emerald-500 + ↑ arrow. Negative: text-rose-500 + ↓ arrow
+Sparkline:       Stroke primary-pop, 2px, 48px tall
+```
+
+### Tables (Dashboard Context — Professional Mode)
+```
+Header:          bg-slate-50, Inter text-xs uppercase tracking-wider text-slate-400, font-medium
+Rows:            bg-white, hover:bg-sky-joy/30, border-b border-slate-100
+Text:            Inter text-sm text-slate-700
+Numbers:         Inter tabular-nums, text-right
+Status dots:     8px rounded-full (emerald-400, amber-400, rose-400)
+Actions:         text-primary-pop hover:underline
+```
+
+### Agent Status Components
+```
+Agent Dot:       12px rounded-full with 2px ring, agent color
+  Active:        Pulse animation (2s ease-in-out infinite)
+  Idle:          Solid, no animation
+  Error:         Rose-500, no pulse
+Agent Card:      White card with 4px left-border in agent color
+Agent Colors:
+  Listing:       #3b82f6 (primary-pop blue)
+  Inventory:     #22c55e (emerald)
+  Advertising:   #f59e0b (amber)
+  Pricing:       #8b5cf6 (violet)
+  Analytics:     #06b6d4 (cyan)
+  Compliance:    #6b7280 (gray)
+  Orchestrator:  #f472b6 (accent-joy pink)
+```
+
+### Approval Cards
+```
+Background:      White card, rounded-2xl, shadow-lg
+Left border:     4px solid agent-color
+Agent badge:     Small pill with agent icon + name, agent-color bg at 10%, text in agent-color
+Action text:     Inter text-base text-on-surface
+Reasoning:       Expandable, Inter text-sm text-slate-500
+Approve button:  bg-emerald-500 text-white rounded-xl, shadow-[0_4px_0_rgb(21,128,61)]
+Reject button:   bg-white border-2 border-slate-200 text-slate-600 rounded-xl
+```
+
+### Empty States
+```
+Character:       Mascot variant (waving, pointing, or thinking)
+Heading:         Fredoka text-2xl font-bold text-on-surface
+Body:            Inter text-lg text-slate-500, max-w-md, leading-relaxed
+CTA:             Primary 3D push button
+Tone:            Encouraging: "No campaigns yet — let's launch your first one!"
+```
 
 ---
 
-## 7. Spacing
+## 7. Shadows & Depth
+
 ```
-Card padding:        16px
-Between cards:       24px gap
-Section separation:  28-36px (REPLACES horizontal rules)
-Table row gap:       4px (REPLACES dividers)
-Page top margin:     48px below header
-Sidebar:             256px / 56px collapsed
-Top bar:             56px height
+Card shadow:         shadow-lg (0 10px 15px rgba(0,0,0,0.1))
+Card hover:          shadow-xl (gentle lift)
+Primary button:      shadow-[0_10px_0_rgb(30,58,138)] — 3D push effect
+Character:           drop-shadow(0 20px 30px rgba(59,130,246,0.3)) — blue glow
+Background blobs:    blur-3xl, opacity-40/50, mix-blend-multiply — dreamy atmosphere
+Modals/popovers:     shadow-2xl + backdrop-blur-sm (frosted glass)
+Inputs focused:      shadow-sm (subtle lift on focus)
+```
+
+**Shadow color rule:** Shadows should always have a BLUE or WARM tint (rgba of primary-pop or slate), never pure black. This keeps the overall feeling warm.
+
+---
+
+## 8. Animation & Motion
+
+```
+Character float:     translateY(-20px) rotate(2deg), 4s ease-in-out infinite
+Cloud drift:         translateX(-10% → 10%), 15s ease-in-out infinite alternate
+Button press:        translateY(5px), 200ms — physical push-down feedback
+Hover transitions:   transition-all duration-200
+Page transitions:    300ms fade + slide-up
+Celebration:         Confetti burst on achievement moments (use canvas-confetti library)
+Agent pulse:         2s ease-in-out infinite on active status dots
+Skeleton loaders:    Shimmer sweep, slate-100 → slate-200, 1.5s loop
+```
+
+**Animation philosophy:** Animations make the product feel ALIVE. The character floats gently. Clouds drift. Buttons physically push down. The AI feels present and active. But data screens are calmer — animations are subtler in the dashboard than on auth/onboarding screens.
+
+All animations respect `prefers-reduced-motion`.
+
+---
+
+## 9. Border Radius Scale
+
+The radius scale is GENEROUS — everything feels soft and rounded:
+```
+Chips/badges:        rounded-lg (8px)
+Inputs:              rounded-xl (12px)
+Buttons:             rounded-2xl (16px)
+Cards:               rounded-2xl (16px)
+Character body:      rounded-3xl (24px)
+Avatars/dots:        rounded-full
+Background blobs:    rounded-full
+Logo icon:           rounded-lg (8px)
 ```
 
 ---
 
-## 8. Animation
-- Agent status: 2s subtle pulse on active dots ONLY
-- Skeleton loaders: shimmer sweep 1.5s
-- Hover: 150ms opacity/bg transitions
-- Modals: 200ms fade + 10px slide-up
-- NEVER: float, bounce, drift, cloud, infinite decorative animations
-- All respect `prefers-reduced-motion`
+## 10. Icons
+
+**Library:** Material Symbols Outlined (Google)
+```html
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+```
+
+**Decorative icons** (celebrations, character accessories):
+- `star` — yellow-400
+- `auto_awesome` — primary-pop (sparkle)
+- `celebration` — pink-400 (confetti)
+- `favorite` — accent-joy (heart)
+- `bolt` — white on primary-pop (logo)
+
+**Functional icons** (navigation, actions):
+- Default weight, 24px
+- Color: text-slate-500 (inactive), text-primary-pop (active/hover)
+- Used in: sidebar nav, table actions, form field left-icons, buttons
 
 ---
 
-## 9. Prompt Template
+## 11. Language & Tone
 
-Use this structure for EVERY mockup prompt:
+The copywriting is a CORE part of the design system. Our product has personality.
+
+### Auth & Onboarding Screens (Maximum Personality)
+```
+Success:     "Woohoo! It's on its way!"     NOT "Email sent successfully"
+Error:       "Hmm, that didn't work"        NOT "Error: Invalid credentials"
+Loading:     "Warming up the engines..."     NOT "Loading..."
+Welcome:     "Welcome aboard!"              NOT "Welcome"
+CTA:         "Let's go!"                    NOT "Continue"
+Reset:       "Back to the login party"      NOT "Return to login"
+Resend:      "Give it another nudge!"       NOT "Resend email"
+Empty:       "Nothing here yet — let's change that!"
+```
+
+### Dashboard & Data Screens (Professional with Warmth)
+```
+Data labels:     Professional: "Total Revenue", "Buy Box Win Rate", "ACoS"
+Insights:        Warm but clear: "Your pricing agent saved you $340 today"
+Approvals:       Direct: "Review 3 pending actions"
+Alerts:          Friendly: "Heads up — Widget X is running low"   NOT "WARNING: Low inventory"
+```
+
+The split: **Auth/onboarding/celebrations = full personality. Dashboard/data = warm professionalism.**
+
+---
+
+## 12. Responsive Behavior
 
 ```
-[Paste Section 2: HARD CONSTRAINTS — the full block between === markers]
-
-DESIGN SYSTEM TOKENS:
-Page background: #0d1322
-Card surfaces: #191f2f (no border, sits on #0d1322)
-Input backgrounds: #1e2435
-Primary text: #e1e2e8 (Inter)
-Muted text: #c3c6cf (Inter)
-Primary accent: #abc9f2
-CTA button: linear-gradient(135deg, #abc9f2, #1b3a5c), text #0e305a
-Focus/links: #a0caff
-Data font: JetBrains Mono for emails, ASINs, prices
-Danger: #ffb4ab with 3px left-border accent (not full-red backgrounds)
-
-[Paste the specific screen description with inline hex values on every element]
-
-FINAL REMINDER — REJECT CRITERIA:
-If the output has ANY of these, regenerate:
-- White or light background (anything lighter than #33394a)
-- Cartoon illustrations, mascots, or characters
-- Fredoka, Poppins, or any rounded font
-- "Woohoo", "party", "magic", "awesome" or other playful text
-- Visible borders (>1px) on cards or layout sections
-- rounded-2xl or rounded-3xl on any element
-- Shadow-2xl or 3D push-button shadows
-- Background gradient blobs or blur clouds
-- Decorative star/sparkle/celebration icons
-- Floating or bouncing animations
+Desktop (>1024px):  Full sidebar + multi-column grid + full tables + character illustrations
+Tablet (768-1024):  Collapsed sidebar + 2-column grid + character at reduced scale
+Mobile (<768):      Bottom nav + single column + no character on data screens + simplified bg
 ```
 
 ---
 
-## 10. Do's and Don'ts (Quick Reference)
+## 13. Logo
+
+```
+Icon:    8×8 square, bg-primary-pop (#3b82f6), rounded-lg (8px)
+         Material Symbols "bolt" icon inside, text-white
+Text:    "Seller Autopilot" — Fredoka, font-bold, text-lg, text-slate-600
+Layout:  Icon + text horizontal, gap-2
+```
+
+---
+
+## 14. Tailwind Config
+
+```javascript
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "sky-joy": "#e0f2fe",
+        "primary-pop": "#3b82f6",
+        "accent-joy": "#f472b6",
+        "surface": "#ffffff",
+        "on-surface": "#1e293b"
+      },
+      fontFamily: {
+        "whimsical": ["Fredoka", "sans-serif"],
+        "body": ["Inter", "sans-serif"]
+      }
+    }
+  }
+}
+```
+
+---
+
+## 15. Prompt Template
+
+Structure for EVERY mockup prompt:
+
+```
+=== DESIGN SYSTEM: JOYFUL TECH ===
+
+This is "Seller Autopilot" — a friendly, bright B2B SaaS for Amazon sellers.
+The aesthetic is JOYFUL, WARM, PLAYFUL, and ENCOURAGING.
+Think: Notion warmth × Duolingo character × Stripe data clarity × Figma personality.
+
+MUST look like the reference (light sky-blue gradient, Fredoka headlines, 3D push buttons, 
+playful character mascot, celebratory language, generous rounded corners).
+
+MUST NOT look like: dark dashboards, Bloomberg terminals, generic Bootstrap, enterprise grey.
+
+COLORS:
+- Page: gradient from #e0f2fe via #f0f9ff to #ffffff + soft blurred blobs
+- Primary: #3b82f6 (bright blue — buttons, links, character)
+- Accent: #f472b6 (pink — secondary links, decorative)
+- Surface: #ffffff (white cards)
+- Text: #1e293b (slate-800 primary), #475569 (slate-600 muted), #94a3b8 (slate-400 light)
+- Selection: accent-joy (#f472b6) at 30% opacity
+
+FONTS:
+- Headlines/Buttons/Logo: Fredoka (400/600/700) — rounded, friendly
+- Body/UI: Inter (400/500/600) — clean, professional
+- Data identifiers (emails, ASINs): Inter bold in primary-pop, with dashed-border badge
+
+COMPONENTS:
+- Primary buttons: 3D push effect — bg #3b82f6, shadow-[0_10px_0_rgb(30,58,138)], rounded-2xl
+  Hover: shadow compresses + translateY(5px). Active: fully pressed, shadow-none + translateY(8px)
+- Cards: white bg, rounded-2xl (16px), shadow-lg, p-6
+- Inputs: white bg, border-2 slate-200 → primary-pop on focus, rounded-xl (12px), 48px height
+- Border radius scale: badges 8px, inputs 12px, buttons/cards 16px, character 24px
+
+CHARACTER: Friendly robot/envelope mascot with eyes, smile, arms, antenna.
+Float animation. Blue drop-shadow. Decorative sparkle/star/celebration icons around it.
+Use on: auth screens, empty states, celebrations, onboarding.
+Do NOT use on: data tables, analytics charts.
+
+LANGUAGE: Playful and warm.
+"Woohoo!" not "Success". "Let's go!" not "Continue". "Give it another nudge!" not "Resend".
+
+BACKGROUND: Sky gradient + drifting white cloud blobs + soft colored blobs (blue, pink, yellow).
+SHADOWS: Blue-tinted, warm. 3D on buttons. Drop-shadow on character. Never pure black.
+ANIMATION: Character floats (4s). Clouds drift (15s). Buttons push. Everything alive but calm.
+
+[Your specific screen description here]
+```
+
+---
+
+## 16. Do's and Don'ts
 
 ### Do
-- ✅ Dark surfaces (#0d1322 → #33394a tonal layers) for ALL backgrounds
-- ✅ Inter + JetBrains Mono ONLY
-- ✅ Gradient CTA button: `linear-gradient(135deg, #abc9f2, #1b3a5c)`
-- ✅ Glassmorphism on modals/popovers (blur + 80% opacity surface)
-- ✅ 8px max border-radius (4px for chips)
-- ✅ Spacing (28-36px) instead of divider lines
-- ✅ Thin-stroke (1.5px) monochrome icons
-- ✅ Professional, direct language
-- ✅ High data density — power users want MORE information
+- ✅ Use Fredoka for all headlines, buttons, and celebratory text
+- ✅ Use the sky gradient + blob background on auth/onboarding screens
+- ✅ Use the 3D push-button effect on all primary CTAs
+- ✅ Use the mascot character on appropriate screens (auth, empty, celebrations)
+- ✅ Write playful, encouraging copy on auth/onboarding screens
+- ✅ Use generous border radius (12-24px on main elements)
+- ✅ Use Material Symbols Outlined for all icons
+- ✅ Use dashed-border badges for data identifiers (emails, ASINs)
+- ✅ Use blue-tinted shadows, never pure black
+- ✅ Add floating/drift animations for atmosphere on non-data screens
 
 ### Don't
-- ❌ Light/white backgrounds (NEVER)
-- ❌ Illustrations, characters, mascots, cartoon robots (NEVER)
-- ❌ Playful fonts: Fredoka, Poppins, Nunito, Comic Sans (NEVER)
-- ❌ Playful language: Woohoo, party, magic, nudge, Oops (NEVER)
-- ❌ Visible borders (>1px) for layout sectioning (NEVER)
-- ❌ rounded-2xl or larger (NEVER)
-- ❌ Shadow-2xl, 3D button shadows (NEVER)
-- ❌ Gradient blobs, blur clouds, decorative backgrounds (NEVER)
-- ❌ Decorative icons: stars, sparkles, celebration, favorite (NEVER)
-- ❌ Floating/bouncing/drifting animations (NEVER)
-- ❌ Material Design elevation patterns (NEVER)
-- ❌ Zebra striping on tables (NEVER)
+- ❌ Use dark backgrounds (this is a light, bright, sky-themed app)
+- ❌ Use sharp corners (minimum 8px radius on everything)
+- ❌ Use flat, shadowless buttons (the 3D push effect is a signature)
+- ❌ Write clinical/cold copy ("Error occurred" → "Hmm, that didn't work")
+- ❌ Use the mascot character on data-heavy screens (distracting)
+- ❌ Use generic grey admin template patterns
+- ❌ Use thin, corporate fonts for headlines (Fredoka's roundedness is key)
+- ❌ Use black shadows (always blue-tinted or warm-tinted)
+- ❌ Flatten the background to a single color (the gradient + blobs create atmosphere)
