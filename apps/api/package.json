@@ -1,0 +1,11 @@
+{
+  "name": "@repo/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "uvicorn apps.api.main:app --reload --host 0.0.0.0 --port 8000",
+    "test": "python3 -m pytest tests/ -v",
+    "lint": "ruff check .",
+    "typecheck": "pyright ."
+  }
+}
