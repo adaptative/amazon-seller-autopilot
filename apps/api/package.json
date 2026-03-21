@@ -6,6 +6,6 @@
     "dev": "uvicorn apps.api.main:app --reload --host 0.0.0.0 --port 8000",
     "test": "python3 -m pytest tests/ -v",
     "lint": "ruff check .",
-    "typecheck": "pyright ."
+    "typecheck": "npx pyright ."
   }
 }
