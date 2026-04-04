@@ -4,7 +4,7 @@ from httpx import AsyncClient, ASGITransport
 
 @pytest.mark.asyncio
 async def test_health_returns_200():
-    from apps.api.main import app
+    from main import app
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -14,7 +14,7 @@ async def test_health_returns_200():
 
 @pytest.mark.asyncio
 async def test_health_returns_status_fields():
-    from apps.api.main import app
+    from main import app
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -28,7 +28,7 @@ async def test_health_returns_status_fields():
 
 @pytest.mark.asyncio
 async def test_cors_allows_frontend():
-    from apps.api.main import app
+    from main import app
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:

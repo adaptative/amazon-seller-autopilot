@@ -51,10 +51,6 @@ jobs:
     needs: typecheck
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

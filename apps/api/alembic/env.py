@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -5,6 +6,14 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 config = context.config
+
+# Override sqlalchemy.url from environment variable
+database_url = os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://seller_autopilot:localdev@localhost:5432/seller_autopilot",
+)
+config.set_main_option("sqlalchemy.url", database_url)
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
