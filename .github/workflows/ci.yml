@@ -17,7 +17,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx turbo run lint
+      - run: npx turbo run lint --filter='!@repo/api'
 
   typecheck:
     name: Type Check
@@ -30,7 +30,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx turbo run typecheck
+      - run: npx turbo run typecheck --filter='!@repo/api'
 
   test-frontend:
     name: Test Frontend
@@ -55,6 +55,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e "apps/api[dev]"
+      - run: cd apps/api && ruff check .
       - run: cd apps/api && python -m pytest tests/ -v
 
   build:
