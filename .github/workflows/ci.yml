@@ -72,10 +72,21 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+      localstack:
+        image: localstack/localstack:3
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: sqs,s3,secretsmanager
+          DEFAULT_REGION: us-east-1
     env:
       DATABASE_URL: postgresql+asyncpg://seller_autopilot:localdev@localhost:5432/seller_autopilot
       APP_DATABASE_URL: postgresql+asyncpg://app_user:app_user_pass@localhost:5432/seller_autopilot
       REDIS_URL: redis://localhost:6379/0
+      AWS_ENDPOINT_URL: http://localhost:4566
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
