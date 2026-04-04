@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Email Sent! - Seller Autopilot</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "sky-joy": "#e0f2fe",
+              "primary-pop": "#3b82f6",
+              "accent-joy": "#f472b6",
+              "surface": "#ffffff",
+              "on-surface": "#1e293b"
+            },
+            fontFamily: {
+              "whimsical": ["Fredoka", "sans-serif"],
+              "body": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style type="text/tailwindcss">@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        } 50% {
+        transform: translateY(-20px) rotate(2deg);
+        }
+    }
+@keyframes drift {
+    0% {
+        transform: translateX(-10%);
+        } 100% {
+        transform: translateX(10%);
+        }
+    }
+.animate-float {
+    animation: float 4s ease-in-out infinite
+    }
+.cloud-drift {
+    animation: drift 15s ease-in-out infinite alternate
+    }
+.character-shadow {
+    filter: drop-shadow(0 20px 30px rgba(59, 130, 246, 0.3))
+    }
+.paper-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCEVezScCNH_Cb6dzWS16UmW4YVC7SKMrRo0Rk2rWIC91GwJ6j5eSjQ-D1L3uFzCLvZLRufYOyOTWmqHeYdd8I-bkQYNiPXE75iZ9Ev53EWepEde0sOzAao-wKF2mEaJWm6u0oOdP0NugXzwuGtjtOe8L3Xkg4IJI3I31GFviFIBzorzv5teGQPARVoFBwmfnXLtxc7YCR7DLi7zkT5uuLnPocRYQZIgbVDbyMZwkZTrdbcTx3MfnXZkUz6YGaNPoxfxFn8frl4upe4)
+    }</style>
+</head>
+<body class="bg-[#f0f9ff] text-on-surface font-body min-h-screen overflow-hidden relative selection:bg-accent-joy/30">
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-[#e0f2fe] via-[#f0f9ff] to-[#ffffff]"></div>
+<div class="cloud-drift absolute top-20 left-[10%] w-64 h-32 bg-white/60 rounded-full blur-3xl"></div>
+<div class="cloud-drift absolute top-40 right-[15%] w-80 h-40 bg-white/40 rounded-full blur-3xl" style="animation-delay: -5s;"></div>
+<div class="absolute -bottom-20 -left-20 w-[600px] h-[600px] bg-blue-100 rounded-full opacity-40 mix-blend-multiply blur-3xl"></div>
+<div class="absolute -top-20 -right-20 w-[500px] h-[500px] bg-pink-50 rounded-full opacity-50 mix-blend-multiply blur-3xl"></div>
+</div>
+<main class="relative z-10 flex flex-col items-center justify-center min-h-screen p-6 text-center">
+<div class="relative mb-12 animate-float">
+<div class="relative z-20 character-shadow">
+<div class="w-64 h-48 bg-white border-4 border-primary-pop rounded-3xl relative flex flex-col items-center justify-center overflow-hidden shadow-2xl">
+<div class="absolute top-0 left-0 w-full h-1/2 bg-blue-50 border-b-4 border-primary-pop/20"></div>
+<div class="relative z-10 flex gap-6 mt-4">
+<div class="w-4 h-4 bg-slate-800 rounded-full"></div>
+<div class="w-4 h-4 bg-slate-800 rounded-full"></div>
+</div>
+<div class="relative z-10 w-8 h-4 border-b-4 border-slate-800 rounded-full mt-2"></div>
+<div class="absolute top-4 right-4 w-10 h-12 border-2 border-accent-joy/40 rounded-sm flex items-center justify-center opacity-60">
+<span class="material-symbols-outlined text-accent-joy text-xl">favorite</span>
+</div>
+</div>
+<div class="absolute -left-12 top-1/2 -translate-y-1/2">
+<div class="w-16 h-4 bg-primary-pop rounded-full rotate-12"></div>
+</div>
+<div class="absolute -right-12 top-1/2 -translate-y-1/2">
+<div class="w-16 h-4 bg-primary-pop rounded-full -rotate-12"></div>
+</div>
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center">
+<div class="w-1 h-12 bg-slate-400"></div>
+<div class="flex gap-1 -mt-12">
+<div class="w-12 h-2 bg-accent-joy rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 z-0">
+<span class="material-symbols-outlined absolute -top-10 -left-10 text-yellow-400 text-4xl">star</span>
+<span class="material-symbols-outlined absolute top-20 -right-16 text-primary-pop text-3xl">auto_awesome</span>
+<span class="material-symbols-outlined absolute -bottom-10 left-1/2 text-pink-400 text-3xl">celebration</span>
+</div>
+</div>
+<div class="max-w-xl mx-auto space-y-6">
+<h1 class="font-whimsical text-6xl md:text-7xl font-bold text-slate-900 tracking-tight leading-tight">
+                Woohoo! <br/>
+<span class="text-primary-pop">It's on its way!</span>
+</h1>
+<p class="text-lg md:text-xl text-slate-600 font-medium max-w-md mx-auto leading-relaxed">
+                Our messenger just zipped a magic link over to 
+                <span class="inline-block px-2 py-1 bg-white border-2 border-dashed border-primary-pop/30 rounded-lg text-primary-pop font-bold">seller@example.com</span>
+</p>
+<div class="pt-8">
+<a class="group relative inline-flex items-center justify-center px-10 py-5 font-whimsical text-xl font-bold text-white transition-all duration-200 bg-primary-pop rounded-2xl hover:bg-slate-900 shadow-[0_10px_0_rgb(30,58,138)] hover:shadow-[0_5px_0_rgb(0,0,0)] hover:translate-y-[5px] active:translate-y-[8px] active:shadow-none" href="/login">
+<span class="material-symbols-outlined mr-3">home</span>
+                    Back to the login party
+                </a>
+</div>
+<p class="text-sm text-slate-400 pt-6">
+                Still waiting? 
+                <button class="text-accent-joy font-bold hover:underline underline-offset-4">Give it another nudge!</button>
+</p>
+</div>
+</main>
+<footer class="fixed bottom-0 w-full py-8 px-12 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm gap-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary-pop rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">bolt</span>
+</div>
+<span class="font-whimsical font-bold text-slate-600 text-lg">Seller Autopilot</span>
+</div>
+<div class="flex gap-8 font-medium">
+<a class="hover:text-primary-pop transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary-pop transition-colors" href="#">Terms</a>
+<a class="hover:text-primary-pop transition-colors" href="#">Security</a>
+</div>
+</footer>
+<div class="fixed -bottom-12 -left-12 w-48 h-48 bg-yellow-100 rounded-full blur-2xl opacity-40"></div>
+<div class="fixed -bottom-12 -right-12 w-64 h-64 bg-primary-pop/10 rounded-full blur-3xl opacity-30"></div>
+
+</body></html>
