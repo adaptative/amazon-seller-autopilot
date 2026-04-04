@@ -17,7 +17,7 @@ logger = structlog.get_logger()
 
 # Paths that skip authentication
 PUBLIC_PATHS = frozenset({"/health", "/docs", "/openapi.json", "/redoc"})
-PUBLIC_PREFIXES = ("/api/v1/auth/",)
+PUBLIC_PREFIXES = ("/api/v1/auth/", "/api/v1/connections/callback")
 
 # Rate limit tiers (requests per minute)
 RATE_LIMITS = {
