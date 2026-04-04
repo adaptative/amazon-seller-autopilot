@@ -4,6 +4,8 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers.auth import router as auth_router
+
 logger = structlog.get_logger()
 
 app = FastAPI(title="Seller Autopilot API", version="0.1.0")
@@ -16,6 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register routers
+app.include_router(auth_router)
+
 
 async def _check_database() -> str:
     """Ping PostgreSQL with SELECT 1."""
@@ -26,7 +31,6 @@ async def _check_database() -> str:
             "DATABASE_URL",
             "postgresql://seller_autopilot:localdev@localhost:5432/seller_autopilot",
         )
-        # asyncpg expects postgres:// scheme
         dsn = db_url.replace("postgresql+asyncpg://", "postgresql://")
         conn = await asyncpg.connect(dsn)
         try:
