@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["models*"]
+include = ["models*", "core*", "services*", "routers*", "schemas*"]
 
 [project]
 name = "seller-autopilot-api"
@@ -19,6 +19,9 @@ dependencies = [
     "redis>=5.2.0",
     "pydantic>=2.10.0",
     "pydantic-settings>=2.6.0",
+    "pydantic[email]>=2.10.0",
+    "bcrypt>=4.0.0",
+    "PyJWT>=2.8.0",
 ]
 
 [project.optional-dependencies]
