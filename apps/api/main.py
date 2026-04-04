@@ -4,12 +4,21 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.middleware import (
+    ErrorHandlerMiddleware,
+    RateLimitMiddleware,
+    RequestLoggingMiddleware,
+    TenantContextMiddleware,
+)
 from routers.auth import router as auth_router
 
 logger = structlog.get_logger()
 
 app = FastAPI(title="Seller Autopilot API", version="0.1.0")
 
+# ── Middleware stack (outermost first) ──────────────────────────
+# Order: CORS → ErrorHandler → RequestLogging → RateLimit → TenantContext
+# CORS must be outermost for preflight requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -17,11 +26,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(ErrorHandlerMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(TenantContextMiddleware)
 
-# Register routers
+# ── Routers ─────────────────────────────────────────────────────
 app.include_router(auth_router)
 
 
+# ── Health Check ────────────────────────────────────────────────
 async def _check_database() -> str:
     """Ping PostgreSQL with SELECT 1."""
     try:
@@ -81,3 +95,9 @@ async def health_check():
         },
         status_code=status_code,
     )
+
+
+# ── Test endpoint for error handler testing ─────────────────────
+@app.get("/api/v1/trigger-test-error")
+async def trigger_test_error():
+    raise RuntimeError("This is a test error for middleware testing")
