@@ -14,7 +14,7 @@ from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from core.config import JWT_ALGORITHM, JWT_SECRET
-from core.security import create_access_token, create_refresh_token, hash_password
+from core.security import create_access_token, hash_password
 
 # ── Test Configuration ────────────────────────────────────────────
 

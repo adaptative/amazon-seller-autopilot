@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 import jwt
 import structlog
-from sqlalchemy import select, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.security import (
