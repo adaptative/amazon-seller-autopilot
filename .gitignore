@@ -20,6 +20,9 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Turbo
+.turbo/
+
 # Build
 dist/
 build/
