@@ -78,3 +78,58 @@ export const listingsApi = {
   getHistory: (asin: string) =>
     apiClient.get<{ actions: any[] }>(`/listings/${asin}/history`).then((r) => r.data),
 };
+
+// ── Pricing types ────────────────────────────────────────────────
+
+export interface PricingStats {
+  buyBoxWinRate: number;
+  buyBoxTrend: number;
+  avgMargin: number;
+  marginTrend: number;
+  priceChangesToday: number;
+  changesTrend: number;
+  revenueImpact: number;
+}
+
+export interface PricedProduct {
+  asin: string;
+  title: string;
+  ourPrice: number;
+  buyBoxPrice: number;
+  competitorCount: number;
+  weOwnBuyBox: boolean;
+  lastChange: string;
+  lastChangeDir: 'up' | 'down' | 'none';
+  imageUrl?: string;
+}
+
+export interface BuyBoxHistoryPoint {
+  date: string;
+  winRate: number;
+}
+
+export interface CompetitorPoint {
+  sellerId: string;
+  sellerName: string;
+  price: number;
+  rating: number;
+  isOurs: boolean;
+  isBuyBoxWinner: boolean;
+}
+
+export const pricingApi = {
+  getStats: () =>
+    apiClient.get<PricingStats>('/pricing/stats').then((r) => r.data),
+
+  getProducts: (params?: { page?: number; pageSize?: number }) =>
+    apiClient.get<PaginatedResponse<PricedProduct>>('/pricing/products', { params }).then((r) => r.data),
+
+  getBuyBoxHistory: (days?: number) =>
+    apiClient.get<BuyBoxHistoryPoint[]>('/pricing/buybox-history', { params: { days } }).then((r) => r.data),
+
+  getCompetitorMap: (asin?: string) =>
+    apiClient.get<CompetitorPoint[]>('/pricing/competitor-map', { params: { asin } }).then((r) => r.data),
+
+  reprice: (asin: string) =>
+    apiClient.post<{ success: boolean }>(`/pricing/reprice/${asin}`).then((r) => r.data),
+};
