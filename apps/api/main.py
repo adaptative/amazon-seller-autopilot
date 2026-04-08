@@ -12,6 +12,7 @@ from core.middleware import (
 )
 from routers.auth import router as auth_router
 from routers.connections import router as connections_router
+from routers.listings import router as listings_router
 from routers.ws import router as ws_router
 
 logger = structlog.get_logger()
@@ -36,6 +37,7 @@ app.add_middleware(TenantContextMiddleware)
 # ── Routers ─────────────────────────────────────────────────────
 app.include_router(auth_router)
 app.include_router(connections_router)
+app.include_router(listings_router)
 app.include_router(ws_router)
 
 
