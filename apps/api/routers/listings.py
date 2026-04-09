@@ -2,7 +2,6 @@
 
 import json
 import os
-import uuid
 
 import structlog
 from fastapi import APIRouter, Depends, Header, Query
