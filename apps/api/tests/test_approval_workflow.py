@@ -76,7 +76,8 @@ async def db_session():
                                {"tid": str(TENANT_A_ID)})
 
         async with AsyncSession(app_engine, expire_on_commit=False) as session:
-            await session.execute(text(f"SET app.current_tenant = '{TENANT_A_ID}'"))
+            await session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                      {"tid": str(TENANT_A_ID)})
             yield session
 
     finally:
@@ -165,7 +166,8 @@ class TestApprovalStateMachine:
         # With agent registered, it goes to completed
         assert result["status"] in ("executing", "completed")
 
-        await db_session.execute(text(f"SET app.current_tenant = '{tenant_a.id}'"))
+        await db_session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                 {"tid": str(tenant_a.id)})
         row = await db_session.execute(
             text("SELECT status, approved_at, approved_by FROM agent_actions WHERE id = :id"),
             {"id": proposed_action.id},
@@ -232,7 +234,8 @@ class TestAutoApproval:
             action_type="price_match", proposed_change={"new_price": 24.99},
             confidence=0.97, auto_approve_eligible=True,
         )
-        await db_session.execute(text(f"SET app.current_tenant = '{tenant_a.id}'"))
+        await db_session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                 {"tid": str(tenant_a.id)})
         result = await db_session.execute(
             text("SELECT status FROM agent_actions WHERE id = :id"),
             {"id": action_id},
@@ -247,7 +250,8 @@ class TestAutoApproval:
             action_type="price_match", proposed_change={"new_price": 24.99},
             confidence=0.80, auto_approve_eligible=True,
         )
-        await db_session.execute(text(f"SET app.current_tenant = '{tenant_a.id}'"))
+        await db_session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                 {"tid": str(tenant_a.id)})
         result = await db_session.execute(
             text("SELECT status FROM agent_actions WHERE id = :id"),
             {"id": action_id},
@@ -298,7 +302,8 @@ class TestExpiration:
             expires_in_minutes=0,  # Already expired
         )
         await workflow_engine.cleanup_expired()
-        await db_session.execute(text(f"SET app.current_tenant = '{tenant_a.id}'"))
+        await db_session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                 {"tid": str(tenant_a.id)})
         result = await db_session.execute(
             text("SELECT status FROM agent_actions WHERE id = :id"),
             {"id": action_id},
