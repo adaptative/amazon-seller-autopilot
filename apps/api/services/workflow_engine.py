@@ -105,11 +105,13 @@ class WorkflowEngine:
         self._validate_transition(action["status"], "executing")
 
         now = datetime.now(timezone.utc)
+        update_kwargs: dict = {"approved_at": now}
+        if approved_by is not None:
+            update_kwargs["approved_by"] = approved_by
         await self._update_status(
             str(action_id),
             "executing",
-            approved_by=approved_by or uuid.uuid4(),
-            approved_at=now,
+            **update_kwargs,
         )
 
         # Publish event
