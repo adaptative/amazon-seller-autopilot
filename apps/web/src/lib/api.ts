@@ -133,3 +133,33 @@ export const pricingApi = {
   reprice: (asin: string) =>
     apiClient.post<{ success: boolean }>(`/pricing/reprice/${asin}`).then((r) => r.data),
 };
+
+// ── Approval types ──────────────────────────────────────────────
+
+export interface ApprovalAction {
+  id: string;
+  agentType: string;
+  actionType: string;
+  targetAsin: string | null;
+  status: string;
+  proposedChange: Record<string, unknown>;
+  reasoning: string;
+  confidenceScore: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  createdAt: string | null;
+  expiresAt: string | null;
+}
+
+export const approvalsApi = {
+  listPending: () =>
+    apiClient.get<{ actions: ApprovalAction[]; total: number }>('/approvals/pending').then((r) => r.data),
+
+  approve: (actionId: string) =>
+    apiClient.post<{ success: boolean; status: string }>(`/approvals/${actionId}/approve`).then((r) => r.data),
+
+  reject: (actionId: string, reason?: string) =>
+    apiClient.post<{ success: boolean; status: string }>(`/approvals/${actionId}/reject`, { reason }).then((r) => r.data),
+
+  bulkApprove: (minConfidence: number) =>
+    apiClient.post<{ approved_count: number }>('/approvals/bulk-approve', { minConfidence }).then((r) => r.data),
+};

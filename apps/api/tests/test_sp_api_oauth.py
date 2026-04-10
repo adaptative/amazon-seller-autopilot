@@ -4,7 +4,7 @@ import os
 import sys
 import uuid
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import pytest_asyncio
@@ -82,6 +82,25 @@ async def client(admin_engine):
 
 
 @pytest_asyncio.fixture
+async def seed_tenant_a(admin_engine):
+    """Ensure Tenant A exists in the DB."""
+    async with admin_engine.begin() as conn:
+        await conn.execute(text(
+            "INSERT INTO tenants (id, name, slug, subscription_tier, status) "
+            "VALUES (:id, 'OAuth Test A', 'oauth-test-a', 'starter', 'active') "
+            "ON CONFLICT (id) DO NOTHING"),
+            {"id": str(TENANT_A_ID)})
+    yield
+    async with admin_engine.begin() as conn:
+        await conn.execute(text("DELETE FROM amazon_connections WHERE tenant_id = :tid"),
+                           {"tid": str(TENANT_A_ID)})
+        await conn.execute(text("DELETE FROM audit_log WHERE tenant_id = :tid"),
+                           {"tid": str(TENANT_A_ID)})
+        await conn.execute(text("DELETE FROM tenants WHERE id = :tid"),
+                           {"tid": str(TENANT_A_ID)})
+
+
+@pytest_asyncio.fixture
 async def seed_connection_a(admin_engine):
     """Seed an Amazon connection for Tenant A."""
     conn_id = uuid.uuid4()
@@ -146,8 +165,8 @@ class TestOAuthInitiation:
 class TestOAuthCallback:
 
     @pytest.mark.asyncio
-    @patch("routers.connections.exchange_auth_code")
-    async def test_callback_exchanges_code_for_tokens(self, mock_exchange, client, redis_client):
+    @patch("routers.connections.exchange_auth_code", new_callable=AsyncMock)
+    async def test_callback_exchanges_code_for_tokens(self, mock_exchange, client, redis_client, seed_tenant_a):
         state = str(uuid.uuid4())
         await redis_client.set(f"oauth_state:{state}", str(TENANT_A_ID), ex=600)
 
@@ -172,8 +191,8 @@ class TestOAuthCallback:
         assert "state" in response.json()["error"]["message"].lower()
 
     @pytest.mark.asyncio
-    @patch("routers.connections.exchange_auth_code")
-    async def test_tokens_stored_encrypted(self, mock_exchange, client, redis_client, db_session):
+    @patch("routers.connections.exchange_auth_code", new_callable=AsyncMock)
+    async def test_tokens_stored_encrypted(self, mock_exchange, client, redis_client, db_session, seed_tenant_a):
         state = str(uuid.uuid4())
         await redis_client.set(f"oauth_state:{state}", str(TENANT_A_ID), ex=600)
 
