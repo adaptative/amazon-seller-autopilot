@@ -83,7 +83,7 @@ class ListingAgent:
         # Banned promotional language
         all_text = f"{title} {' '.join(bullet_points)} {description} {search_terms}".lower()
         for phrase in BANNED_PHRASES:
-            if phrase in all_text:
+            if re.search(r'\b' + re.escape(phrase) + r'\b', all_text):
                 errors.append(f"Banned promotional language detected: '{phrase}'")
 
         # No HTML tags

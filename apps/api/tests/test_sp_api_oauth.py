@@ -4,7 +4,7 @@ import os
 import sys
 import uuid
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import pytest_asyncio
@@ -146,7 +146,7 @@ class TestOAuthInitiation:
 class TestOAuthCallback:
 
     @pytest.mark.asyncio
-    @patch("routers.connections.exchange_auth_code")
+    @patch("routers.connections.exchange_auth_code", new_callable=AsyncMock)
     async def test_callback_exchanges_code_for_tokens(self, mock_exchange, client, redis_client):
         state = str(uuid.uuid4())
         await redis_client.set(f"oauth_state:{state}", str(TENANT_A_ID), ex=600)
@@ -172,7 +172,7 @@ class TestOAuthCallback:
         assert "state" in response.json()["error"]["message"].lower()
 
     @pytest.mark.asyncio
-    @patch("routers.connections.exchange_auth_code")
+    @patch("routers.connections.exchange_auth_code", new_callable=AsyncMock)
     async def test_tokens_stored_encrypted(self, mock_exchange, client, redis_client, db_session):
         state = str(uuid.uuid4())
         await redis_client.set(f"oauth_state:{state}", str(TENANT_A_ID), ex=600)

@@ -107,8 +107,7 @@ async def db_session():
 
         async with AsyncSession(app_engine, expire_on_commit=False) as session:
             await session.execute(
-                text("SET app.current_tenant = :tid"),
-                {"tid": str(TENANT_A_ID)},
+                text(f"SET app.current_tenant = '{TENANT_A_ID}'"),
             )
             yield session
 
