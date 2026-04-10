@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from agents.listing_agent import ListingAgent
 from core.database import get_db
 from core.security import decode_token
 
@@ -243,8 +244,6 @@ async def optimize_listing(
     # Run the Listing Agent
     if not ANTHROPIC_API_KEY:
         return _error("CONFIG_ERROR", "Anthropic API key not configured", 500)
-
-    from agents.listing_agent import ListingAgent
 
     agent = ListingAgent(api_key=ANTHROPIC_API_KEY)
 
