@@ -2,7 +2,6 @@
 
 import json
 import os
-import uuid
 
 import structlog
 from fastapi import APIRouter, Depends, Header, Query
@@ -100,7 +99,7 @@ async def list_listings(
     tenant_id = auth["tenant_id"]
 
     # Set tenant context for RLS
-    await db.execute(text("SET app.current_tenant = :tid"), {"tid": tenant_id})
+    await db.execute(text("SELECT set_config('app.current_tenant', :tid, false)"), {"tid": tenant_id})
 
     # Query agent_actions of type 'listing' to build listing catalog
     query = (
@@ -164,7 +163,7 @@ async def get_listing_detail(
         return _error("UNAUTHORIZED", "Missing or invalid authorization", 401)
 
     tenant_id = auth["tenant_id"]
-    await db.execute(text("SET app.current_tenant = :tid"), {"tid": tenant_id})
+    await db.execute(text("SELECT set_config('app.current_tenant', :tid, false)"), {"tid": tenant_id})
 
     result = await db.execute(
         text(
@@ -210,7 +209,7 @@ async def optimize_listing(
         return _error("UNAUTHORIZED", "Missing or invalid authorization", 401)
 
     tenant_id = auth["tenant_id"]
-    await db.execute(text("SET app.current_tenant = :tid"), {"tid": tenant_id})
+    await db.execute(text("SELECT set_config('app.current_tenant', :tid, false)"), {"tid": tenant_id})
 
     # Check for an active Amazon connection
     conn_result = await db.execute(
@@ -294,7 +293,7 @@ async def apply_suggestion(
 
     tenant_id = auth["tenant_id"]
     user_id = auth["user_id"]
-    await db.execute(text("SET app.current_tenant = :tid"), {"tid": tenant_id})
+    await db.execute(text("SELECT set_config('app.current_tenant', :tid, false)"), {"tid": tenant_id})
 
     # Find the most recent proposed action for this ASIN
     result = await db.execute(
@@ -349,7 +348,7 @@ async def get_listing_history(
         return _error("UNAUTHORIZED", "Missing or invalid authorization", 401)
 
     tenant_id = auth["tenant_id"]
-    await db.execute(text("SET app.current_tenant = :tid"), {"tid": tenant_id})
+    await db.execute(text("SELECT set_config('app.current_tenant', :tid, false)"), {"tid": tenant_id})
 
     result = await db.execute(
         text(

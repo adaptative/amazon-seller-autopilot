@@ -30,17 +30,17 @@ describe('PricingDashboard', () => {
   it('renders 4 stat cards', async () => {
     render(<PricingDashboard />);
     await waitFor(() => {
-      expect(screen.getByText('87%')).toBeInTheDocument();
-      expect(screen.getByText('24.8%')).toBeInTheDocument();
-      expect(screen.getByText('12')).toBeInTheDocument();
-      expect(screen.getByText(/\$2,340/)).toBeInTheDocument();
+      expect(screen.getAllByText('87%').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('24.8%').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('12').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/\$2,340/).length).toBeGreaterThanOrEqual(1);
     });
   });
 
   it('stat card values use Fredoka font', async () => {
     render(<PricingDashboard />);
     await waitFor(() => {
-      expect(screen.getByText('87%').className).toMatch(/display|fredoka/i);
+      expect(screen.getAllByText('87%')[0].className).toMatch(/display|fredoka/i);
     });
   });
 

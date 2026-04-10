@@ -1,13 +1,12 @@
 """Pricing Agent tests — 11 test cases covering price calculation, offer change
 processing, Buy Box tracking, and price history."""
 
-import json
 import os
 import sys
 import uuid
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_asyncio
@@ -108,7 +107,7 @@ async def db_session():
 
         async with AsyncSession(app_engine, expire_on_commit=False) as session:
             await session.execute(
-                text("SET app.current_tenant = :tid"),
+                text("SELECT set_config('app.current_tenant', :tid, false)"),
                 {"tid": str(TENANT_A_ID)},
             )
             yield session

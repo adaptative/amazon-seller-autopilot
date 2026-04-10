@@ -16,12 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from agents.listing_agent import (
-    BANNED_PHRASES,
     MAX_BULLET_LENGTH,
     MAX_DESCRIPTION_LENGTH,
-    MAX_SEARCH_TERMS_BYTES,
     MAX_TITLE_LENGTH,
-    REQUIRED_BULLET_COUNT,
     ListingAgent,
 )
 
@@ -63,7 +60,7 @@ def _valid_listing() -> dict:
             "your beverage temperature for hours. The 32oz capacity is perfect for "
             "all-day hydration at the office, gym, or outdoors."
         ),
-        "search_terms": "hydration flask thermos gym workout travel camping hiking",
+        "search_terms": "hydration thermos gym workout camping hiking portable durable",
         "reasoning": "Focused on key product differentiators and common search queries.",
         "confidence_score": 0.92,
     }
@@ -145,7 +142,7 @@ async def db_session():
         async with AsyncSession(app_engine, expire_on_commit=False) as session:
             # Set tenant context for RLS
             await session.execute(
-                text("SET app.current_tenant = :tid"),
+                text("SELECT set_config('app.current_tenant', :tid, false)"),
                 {"tid": str(TENANT_A_ID)},
             )
             yield session
@@ -392,7 +389,7 @@ class TestProposalCreation:
         with patch.object(
             agent.client.messages, "create", return_value=_mock_claude_response()
         ):
-            result = await agent.generate(
+            await agent.generate(
                 asin=TEST_ASIN,
                 product_data=_product_data(),
                 marketplace_id=TEST_MARKETPLACE,
