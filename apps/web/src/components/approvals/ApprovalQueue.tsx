@@ -97,7 +97,7 @@ export function ApprovalQueue() {
             Approval Queue
           </h2>
           <p className="text-sm font-body text-slate-500 mt-1">
-            {actions.length} action{actions.length !== 1 ? "s" : ""} awaiting review
+            {actions.length} pending action{actions.length !== 1 ? "s" : ""} awaiting review
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export function ApprovalQueue() {
             className="px-4 py-2 bg-primary-pop text-white font-body font-medium rounded-xl hover:bg-primary-pop/90 transition-colors"
             data-testid="bulk-approve-btn"
           >
-            Bulk Approve
+            Approve All High
           </button>
         </div>
       </div>
