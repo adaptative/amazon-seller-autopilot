@@ -123,8 +123,10 @@ describe('ListingEditor', () => {
     const { listingsApi } = await import('@/lib/api');
     render(<ListingEditor asin="B08N49K23V" />);
     await waitFor(() => screen.getByRole('button', { name: /regenerate/i }));
+    const callsBefore = (listingsApi.getSuggestion as ReturnType<typeof vi.fn>).mock.calls.length;
     await user.click(screen.getByRole('button', { name: /regenerate/i }));
-    const callCount = (listingsApi.getSuggestion as ReturnType<typeof vi.fn>).mock.calls.length;
-    expect(callCount).toBeGreaterThanOrEqual(2); // Initial + regenerate
+    await waitFor(() => {
+      expect((listingsApi.getSuggestion as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(callsBefore);
+    });
   });
 });

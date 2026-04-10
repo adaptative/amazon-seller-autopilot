@@ -109,7 +109,7 @@ async def callback(
     refresh_token = tokens.get("refresh_token", "")
     encrypted_refresh = encrypt_token(refresh_token)
 
-    # Set RLS tenant context before writing
+    # Set RLS tenant context
     await db.execute(
         text("SELECT set_config('app.current_tenant', :tid, false)"),
         {"tid": tenant_id},
