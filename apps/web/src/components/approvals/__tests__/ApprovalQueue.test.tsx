@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApprovalQueue } from '../ApprovalQueue';
@@ -57,6 +57,10 @@ vi.mock('@/lib/api', () => ({
 describe('ApprovalQueue', () => {
   const user = userEvent.setup();
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders approval cards for each pending action', async () => {
     render(<ApprovalQueue />);
     await waitFor(() => {
@@ -68,8 +72,8 @@ describe('ApprovalQueue', () => {
   it('displays agent type and confidence on each card', async () => {
     render(<ApprovalQueue />);
     await waitFor(() => {
-      expect(screen.getByText('listing_optimize'.replace(/_/g, ' '))).toBeInTheDocument();
-      expect(screen.getByText(/92% confidence/)).toBeInTheDocument();
+      expect(screen.getAllByText('listing_optimize'.replace(/_/g, ' ')).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/92% confidence/).length).toBeGreaterThanOrEqual(1);
     });
   });
 

@@ -75,10 +75,12 @@ async def db_session():
             await conn.execute(text("DELETE FROM audit_log WHERE tenant_id = :tid"),
                                {"tid": str(TENANT_A_ID)})
 
-        async with AsyncSession(app_engine, expire_on_commit=False) as session:
-            await session.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
-                                      {"tid": str(TENANT_A_ID)})
-            yield session
+        # Pin session to a single connection so set_config persists across commits
+        async with app_engine.connect() as connection:
+            await connection.execute(text("SELECT set_config('app.current_tenant', :tid, false)"),
+                                     {"tid": str(TENANT_A_ID)})
+            async with AsyncSession(bind=connection, expire_on_commit=False, join_transaction_block=False) as session:
+                yield session
 
     finally:
         try:
