@@ -60,7 +60,7 @@ def _valid_listing() -> dict:
             "your beverage temperature for hours. The 32oz capacity is perfect for "
             "all-day hydration at the office, gym, or outdoors."
         ),
-        "search_terms": "hydration flask thermos gym workout travel camping hiking",
+        "search_terms": "hydration thermos gym workout camping hiking portable durable",
         "reasoning": "Focused on key product differentiators and common search queries.",
         "confidence_score": 0.92,
     }
@@ -142,7 +142,8 @@ async def db_session():
         async with AsyncSession(app_engine, expire_on_commit=False) as session:
             # Set tenant context for RLS
             await session.execute(
-                text(f"SET app.current_tenant = '{TENANT_A_ID}'"),
+                text("SELECT set_config('app.current_tenant', :tid, false)"),
+                {"tid": str(TENANT_A_ID)},
             )
             yield session
 
