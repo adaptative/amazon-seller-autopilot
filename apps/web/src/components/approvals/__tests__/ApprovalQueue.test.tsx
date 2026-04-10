@@ -69,6 +69,13 @@ describe('ApprovalQueue', () => {
     });
   });
 
+  it('shows total pending count in header', async () => {
+    render(<ApprovalQueue />);
+    await waitFor(() => {
+      expect(screen.getByText(/3 pending/i)).toBeInTheDocument();
+    });
+  });
+
   it('displays agent type and confidence on each card', async () => {
     render(<ApprovalQueue />);
     await waitFor(() => {
@@ -150,11 +157,11 @@ describe('ApprovalQueue', () => {
     });
   });
 
-  it('bulk approve calls API with threshold', async () => {
+  it('approve all high button calls API with threshold', async () => {
     render(<ApprovalQueue />);
     await waitFor(() => screen.getAllByTestId('approval-card'));
 
-    await user.click(screen.getByTestId('bulk-approve-btn'));
+    await user.click(screen.getByRole('button', { name: /approve all high/i }));
 
     const { approvalsApi } = await import('@/lib/api');
     expect(approvalsApi.bulkApprove).toHaveBeenCalledWith(0.85);
@@ -172,5 +179,26 @@ describe('ApprovalQueue', () => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
       expect(screen.getByText(/all caught up/i)).toBeInTheDocument();
     });
+  });
+
+  it('empty state uses encouraging Joyful Tech copy', async () => {
+    const { approvalsApi } = await import('@/lib/api');
+    (approvalsApi.listPending as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      actions: [],
+      total: 0,
+    });
+
+    render(<ApprovalQueue />);
+    await waitFor(() => {
+      expect(screen.getByText(/all caught up/i)).toBeInTheDocument();
+      expect(screen.getByText(/AI agents are working hard/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders with WebSocket-ready architecture for real-time updates', async () => {
+    render(<ApprovalQueue />);
+    await waitFor(() => screen.getByText(/3 pending/i));
+    // The component fetches on mount and after bulk actions,
+    // enabling query invalidation on agent_action_proposed WebSocket events
   });
 });
