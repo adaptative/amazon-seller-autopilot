@@ -222,14 +222,14 @@ async def seed_notifications(db_engines):
 @pytest.fixture
 def auth_headers_tenant_a():
     """JWT headers for Tenant A."""
-    token = create_access_token({"tenant_id": str(TENANT_A_ID), "user_id": str(USER_A_ID)})
+    token = create_access_token(TENANT_A_ID, USER_A_ID)
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
 def auth_headers_tenant_b():
     """JWT headers for Tenant B."""
-    token = create_access_token({"tenant_id": str(TENANT_B_ID), "user_id": str(USER_B_ID)})
+    token = create_access_token(TENANT_B_ID, USER_B_ID)
     return {"Authorization": f"Bearer {token}"}
 
 
