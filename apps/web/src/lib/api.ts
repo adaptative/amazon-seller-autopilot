@@ -134,6 +134,68 @@ export const pricingApi = {
     apiClient.post<{ success: boolean }>(`/pricing/reprice/${asin}`).then((r) => r.data),
 };
 
+// ── Dashboard types ─────────────────────────────────────────────
+
+export interface DashboardStats {
+  totalRevenue: number;
+  revenueTrend: number;
+  ordersToday: number;
+  ordersTrend: number;
+  buyBoxWinRate: number;
+  buyBoxTrend: number;
+  acos: number;
+  acosTrend: number;
+}
+
+export interface AgentStatus {
+  type: string;
+  status: 'active' | 'idle';
+  lastAction: string;
+  lastActionAt: string;
+}
+
+export interface DashboardPendingApproval {
+  id: string;
+  agentType: string;
+  description: string;
+  confidence: number;
+  createdAt: string;
+}
+
+export interface ActivityItem {
+  id: string;
+  agentType: string;
+  action: string;
+  asin: string | null;
+  time: string;
+}
+
+export interface DashboardData {
+  stats: DashboardStats;
+  agents: AgentStatus[];
+  pendingApprovals: DashboardPendingApproval[];
+  recentActivity: ActivityItem[];
+  notificationCount: number;
+}
+
+export interface SearchResult {
+  id: string;
+  category: string;
+  title: string;
+  subtitle: string;
+}
+
+export const dashboardApi = {
+  getData: () =>
+    apiClient.get<DashboardData>('/dashboard').then((r) => r.data),
+
+  search: (query: string) =>
+    apiClient.get<{ results: SearchResult[] }>('/search', { params: { q: query } }).then((r) => r.data),
+
+  getNotificationCount: () =>
+    apiClient.get<{ count: number }>('/notifications/unread-count').then((r) => r.data),
+};
+
 // ── Approval types ──────────────────────────────────────────────
 
 export interface ApprovalAction {
